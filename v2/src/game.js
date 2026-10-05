@@ -20,7 +20,8 @@ export const FOE = {
   d: { kind: 'dog', w: 26, h: 18, pts: 50, label: 'ГАВ!' },
   p: { kind: 'pigeon', w: 16, h: 12, pts: 40, label: 'КУРЛЫ!' },
   g: { kind: 'granny', w: 16, h: 36, pts: 75, label: 'ВАЙ!' },
-  k: { kind: 'courier', w: 28, h: 34, pts: 100, label: 'ДОСТАВКА!' }
+  k: { kind: 'courier', w: 28, h: 34, pts: 100, label: 'ДОСТАВКА!' },
+  x: { kind: 'boss', w: 16, h: 52, pts: 300, label: 'ШЕФ УВОЛЕН!' }
 };
 
 export const G = { state: 'menu', hero: 'azat', levelIndex: 0, world: null, t: 0 };
@@ -72,6 +73,7 @@ function makeFoe(ch, x, y) {
   if (e.kind === 'granny') e.vx = -16;
   if (e.kind === 'pigeon') { e.x0 = e.x; e.y0 = e.y - 8; e.range = 40 + Math.random() * 30; }
   if (e.kind === 'courier') e.wait = true;
+  if (e.kind === 'boss') { e.vx = -30; e.hp = 3; e.hurtT = 0; e.met = false; }
   return e;
 }
 
@@ -293,6 +295,25 @@ function updateFoes(dt) {
           e.thrown = false; e.tx = px; e.ty = p.y + 10;
           text(e.x + e.w / 2, e.y - 8, 'ЭЙ!', '#ff8a8a', 0.6);
         }
+      } else if (e.kind === 'boss') {
+        // the boss in the suit: paces, then pelts you with business cards; takes three hits
+        if (e.hurtT > 0) { e.hurtT -= dt; e.vx *= 0.9; }
+        else e.vx = Math.sign(e.vx || -1) * 30;
+        if (!e.met && Math.abs(dx) < 240) { e.met = true; text(e.x + e.w / 2, e.y - 10, 'ВЫ УВОЛЕНЫ!', '#ffd23a', 1.4); }
+        if (e.throwT > 0) {
+          e.throwT -= dt; e.vx = 0;
+          if (!e.thrown && e.throwT <= 0.25) {
+            e.thrown = true;
+            const s = SPR.boss_throw, m = s && s.meta ? s.meta[1] : null;
+            const hx = m ? m[6] - s.anchor[0] : 10, hy = m ? m[7] - s.anchor[1] : -40;
+            const sx = e.x + e.w / 2 + hx * e.dir, sy = e.y + e.h + hy, tt = Math.max(0.35, Math.abs(e.tx - sx) / 190);
+            ents.bad.push({ kind: 'card', x: sx, y: sy, vx: (e.tx - sx) / tt, vy: (e.ty - sy) / tt - 0.5 * 160 * tt, g: 160, t: 0 }); sfx('throw');
+          }
+        }
+        if (e.hurtT <= 0 && Math.abs(dx) < 210 && Math.abs(dx) > 20 && e.cd <= 0) {
+          e.cd = 1.5; e.throwT = 0.5; e.vx = Math.sign(dx) * 0.01; e.dir = Math.sign(dx);
+          e.thrown = false; e.tx = px; e.ty = p.y + 14;
+        }
       } else if (e.kind === 'courier') {
         if (e.wait) { if (dx > -300 && dx < 0) { e.wait = false; e.vx = -150; text(e.x, e.y - 8, 'БИП-БИП!', '#ffd23a', 0.8); } else continue; }
         e.vx = Math.sign(e.vx) * 150;
@@ -310,12 +331,19 @@ function updateFoes(dt) {
     if (G.state === 'play' && overlap(p, e)) {
       if (p.vy > 30 && p.y + p.h - p.vy * dt <= e.y + 8) {
         killFoe(e, true); p.vy = input.held.jump ? -440 : -300; p.stretch = 1.3;
-      } else if (e.kind !== 'pigeon') hurtPlayer(e.x + e.w / 2, e.kind);
+      } else if (e.kind !== 'pigeon' && !(e.hurtT > 0)) hurtPlayer(e.x + e.w / 2, e.kind);
     }
   }
   ents.foes = ents.foes.filter(e => e.dead < 2.5);
 }
 export function killFoe(e, stomp) {
+  if (e.hp > 1) {                          // the boss shrugs off a hit or two
+    if (e.hurtT > 0) return;
+    e.hp--; e.hurtT = 0.6; e.throwT = 0; e.vx = (e.x > P.x ? 1 : -1) * 90; e.cd = Math.max(e.cd, 0.9);
+    text(e.x + e.w / 2, e.y - 8, ['', 'ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ!', 'ВЫГОВОР!'][e.hp], '#ff8a8a', 0.9);
+    sfx('stomp'); cam.shake = Math.max(cam.shake, 0.12); fx('fx_hit', e.x + e.w / 2, e.y + e.h / 3);
+    G.hitstop = 0.06; return;
+  }
   e.alive = false; e.vy = -220; e.vx = (e.x > P.x ? 1 : -1) * 60; e.dead = 0; score.foes++;
   addPts(e.pts, e.x + e.w / 2, e.y - 8, `${e.label} +${e.pts}`, '#ffffff');
   sfx('stomp'); cam.shake = Math.max(cam.shake, 0.08);

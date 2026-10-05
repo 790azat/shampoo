@@ -131,7 +131,7 @@ function pollInputEdgesClear() { for (const k in input.pressed) input.pressed[k]
 
 // ---------------- boot ----------------
 (async () => {
-  await Promise.all(['heroes', 'actors', 'objects'].map(loadManifest));
+  await Promise.all(['heroes', 'actors', 'objects', 'boss'].map(loadManifest));
   // a backdrop for the menu: the first district
   await loadWorld(LEVELS[0].id);
   refreshMenu();

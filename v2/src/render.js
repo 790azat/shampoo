@@ -108,7 +108,9 @@ const FOE_SPR = {
   dog: e => (Math.abs(e.vx) > 1 ? ['dog_run', frameAt('dog_run', e.t * (Math.abs(e.vx) > 60 ? 1.6 : 1))] : ['dog_idle', frameAt('dog_idle', e.t)]),
   pigeon: e => ['pigeon_fly', frameAt('pigeon_fly', e.t)],
   granny: e => (e.throwT > 0 ? ['granny_throw', Math.min(2, Math.floor((0.45 - e.throwT) / 0.15))] : ['granny_walk', frameAt('granny_walk', e.t)]),
-  courier: e => ['courier_ride', frameAt('courier_ride', e.t)]
+  courier: e => ['courier_ride', frameAt('courier_ride', e.t)],
+  boss: e => (e.hurtT > 0 ? ['boss_hurt', 0] : e.throwT > 0 ? ['boss_throw', Math.min(2, Math.floor((0.5 - e.throwT) / 0.17))]
+    : Math.abs(e.vx) > 1 ? ['boss_walk', frameAt('boss_walk', e.t)] : ['boss_idle', frameAt('boss_idle', e.t)])
 };
 
 function drawEntities(ctx) {
@@ -132,6 +134,7 @@ function drawEntities(ctx) {
     if (!e.alive) { if (!draw(ctx, e.kind + '_dead', 0, fx, e.kind === 'pigeon' ? e.y + e.h / 2 : fy, e.dir)) { ctx.fillStyle = '#a77'; ctx.fillRect(e.x, e.y, e.w, e.h); } continue; }
     const [n, i] = FOE_SPR[e.kind](e);
     if (!draw(ctx, n, i, fx, e.kind === 'pigeon' ? e.y + e.h / 2 : fy + 1, e.dir)) { ctx.fillStyle = '#c33'; ctx.fillRect(e.x, e.y, e.w, e.h); }
+    if (e.kind === 'boss') for (let k = 0; k < 3; k++) { ctx.fillStyle = OL; ctx.fillRect(Math.round(fx) - 11 + k * 8, Math.round(e.y) - 18, 6, 4); ctx.fillStyle = k < e.hp ? '#ff3a4a' : '#5a4a5a'; ctx.fillRect(Math.round(fx) - 10 + k * 8, Math.round(e.y) - 17, 4, 2); }
   }
 }
 
@@ -190,7 +193,8 @@ function drawShots(ctx) {
     else if (!draw(ctx, 'note', frameAt('note', s.t), s.x, s.y + 6, Math.sign(s.vx))) { ctx.fillStyle = '#43e0ff'; ctx.fillRect(s.x - 3, s.y - 5, 6, 10); }
   }
   for (const b of ents.bad) {
-    if (b.kind === 'slipper') { if (!draw(ctx, 'slipper_spin', frameAt('slipper_spin', b.t * 2), b.x, b.y + 3)) { ctx.fillStyle = '#2a8a4a'; ctx.fillRect(b.x - 4, b.y - 2, 8, 4); } }
+    if (b.kind === 'card') { if (!draw(ctx, 'card_spin', frameAt('card_spin', b.t), b.x, b.y + 3)) { ctx.fillStyle = '#fff'; ctx.fillRect(b.x - 3, b.y - 2, 6, 4); } }
+    else if (b.kind === 'slipper') { if (!draw(ctx, 'slipper_spin', frameAt('slipper_spin', b.t * 2), b.x, b.y + 3)) { ctx.fillStyle = '#2a8a4a'; ctx.fillRect(b.x - 4, b.y - 2, 8, 4); } }
     else if (!draw(ctx, 'poop', 0, b.x, b.y + 3)) { ctx.fillStyle = OL; ctx.fillRect(b.x - 2, b.y - 2, 5, 5); ctx.fillStyle = '#f4f4ec'; ctx.fillRect(b.x - 1, b.y - 1, 3, 3); }
   }
 }

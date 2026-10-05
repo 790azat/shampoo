@@ -314,7 +314,7 @@ def render(hero, P):
         K, A = leg_points(hp, th, kn)
         g = capsules([(hp[0], hp[1], K[0], K[1], 4.7), (K[0], K[1], A[0], A[1], 4.1)], cols)
         # cargo pocket on the near thigh
-        if not far:
+        if not far and D.get('pocket', True):
             mx, my = int(round(hp[0] + (K[0] - hp[0]) * 0.55)) - 1, int(round(hp[1] + (K[1] - hp[1]) * 0.45))
             for yy in range(my, my + 5):
                 for xx in range(mx - 2, mx + 2):

@@ -2,7 +2,7 @@
 // the rows above are empty. Legend:
 //   #  ground (auto-tiled)        B  stone block        =  one-way ledge      C  crate (solid)
 //   b  BOOM can   r  Adrenaline Rush   v  VIP pack   t  TEREA pack   s  Head & Shoulders
-//   d  dog   p  pigeon   g  granny   k  courier on a scooter
+//   d  dog   p  pigeon   g  granny   k  courier on a scooter   x  the boss in the suit
 //   P  start   F  checkpoint flag   E  finish
 //   l  lamp  n  bench  u  bin  q  kiosk  T  tree  f  drinking fountain  h  hydrant   (decor, no collision)
 const CH = {
@@ -128,6 +128,14 @@ const CH = {
     "############",
     "############",
     "############"],
+  boss: [
+    "............................",
+    "......b..............b......",
+    "............................",
+    "..l..........n.....x....l...",
+    "############################",
+    "############################",
+    "############################"],
   finish: [
     "...........................",
     ".....b...b...b.............",
@@ -141,12 +149,12 @@ const CH = {
 CH.courier[3] = "..l.......n.......l....k";
 
 export const LEVELS = [
-  { id: 'square', name: 'ПЛОЩАДЬ РЕСПУБЛИКИ', chunks: ['start', 'flat', 'dogrun', 'steps', 'pit', 'pigeons', 'checkpoint', 'granny', 'dogrun', 'pitledge', 'finish'] },
-  { id: 'opera', name: 'ТЕАТР ОПЕРЫ', chunks: ['start', 'pigeons', 'steps', 'granny', 'pit', 'checkpoint', 'towers', 'ledges', 'dogrun', 'finish'] },
-  { id: 'cascade', name: 'КАСКАД', chunks: ['start', 'steps', 'ledges', 'courier', 'checkpoint', 'crates', 'pitledge', 'steps', 'granny', 'finish'] },
-  { id: 'cathedral', name: 'СОБОР', chunks: ['start', 'double', 'pigeons', 'pitledge', 'checkpoint', 'towers', 'courier', 'ledges', 'granny', 'finish'] },
-  { id: 'victory', name: 'ПАРК ПОБЕДЫ', chunks: ['start', 'crates', 'granny', 'ledges', 'checkpoint', 'double', 'pit', 'pigeons', 'courier', 'steps', 'finish'] },
-  { id: 'tower', name: 'ТЕЛЕБАШНЯ', chunks: ['start', 'towers', 'ledges', 'double', 'checkpoint', 'pitledge', 'courier', 'crates', 'granny', 'ledges', 'finish'] }
+  { id: 'square', name: 'ПЛОЩАДЬ РЕСПУБЛИКИ', chunks: ['start', 'flat', 'dogrun', 'steps', 'pit', 'pigeons', 'checkpoint', 'granny', 'dogrun', 'pitledge', 'boss', 'finish'] },
+  { id: 'opera', name: 'ТЕАТР ОПЕРЫ', chunks: ['start', 'pigeons', 'steps', 'granny', 'pit', 'checkpoint', 'towers', 'ledges', 'dogrun', 'boss', 'finish'] },
+  { id: 'cascade', name: 'КАСКАД', chunks: ['start', 'steps', 'ledges', 'courier', 'checkpoint', 'crates', 'pitledge', 'steps', 'granny', 'boss', 'finish'] },
+  { id: 'cathedral', name: 'СОБОР', chunks: ['start', 'double', 'pigeons', 'pitledge', 'checkpoint', 'towers', 'courier', 'ledges', 'granny', 'boss', 'finish'] },
+  { id: 'victory', name: 'ПАРК ПОБЕДЫ', chunks: ['start', 'crates', 'granny', 'ledges', 'checkpoint', 'double', 'pit', 'pigeons', 'courier', 'steps', 'boss', 'finish'] },
+  { id: 'tower', name: 'ТЕЛЕБАШНЯ', chunks: ['start', 'towers', 'ledges', 'double', 'checkpoint', 'pitledge', 'courier', 'crates', 'granny', 'ledges', 'boss', 'finish'] }
 ];
 
 export const ROWS = 17;
