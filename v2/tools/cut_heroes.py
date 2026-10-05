@@ -69,7 +69,8 @@ F = {
         'drop': [('special', (300, 0, 432, 148)), ('special', (432, 0, 566, 148))],
         'hurt': [('hurt', (10, 29, 97, 148))],
         'dead': [('dead', (256, 80, 429, 137))],
-        'smoke': [('extra', (221, 41, 346, 177))],
+        # Azat asked not to have Arsen sit on a crate: he smokes standing, in his drinking pose
+        'smoke': [('extra', (355, 16, 441, 176))],
         'drink': [('extra', (355, 16, 441, 176))],
         'phone': [('extra', (135, 16, 212, 177))],
     },
@@ -224,11 +225,16 @@ def main(prev=None):
                     m[6], m[7] = hx, hy
                     if name == 'drink':
                         m[8] = 0.9
-                if name in ('smoke', 'chill') and hero == 'azat':   # the cigarette between the fingers (Arsen's sheet has one)
+                if hero == 'arsen' and name in ('smoke', 'chill', 'vape'):   # paint the can out of his hand
+                    for y in range(13, 18):
+                        for x in range(21, 25):
+                            if img[y, x, 3] and img[y, x, :3].astype(int).sum() > 150:
+                                img[y, x, :3] = (22, 18, 20)
+                if name in ('smoke', 'chill'):          # the cigarette between the fingers
                     x, y = m[6], m[7]
                     overlay(img, [(x + 1, y - 1), (x + 2, y - 1), (x + 3, y - 1)], (240, 236, 228))
                     overlay(img, [(x + 4, y - 1)], (255, 120, 40))
-                if name == 'vape' and hero == 'azat':   # the IQOS stick
+                if name == 'vape':                      # the IQOS stick
                     x, y = m[6], m[7]
                     overlay(img, [(x + 1, y - 1), (x + 2, y - 1), (x + 3, y - 1), (x + 4, y - 1)], (226, 210, 180))
                     overlay(img, [(x + 4, y - 1)], (180, 140, 100))
@@ -249,7 +255,7 @@ def main(prev=None):
 
 
 # hand (holding the cigarette / can) in the finished frame's coords, set by eye from the previews
-HAND = {'azat': {'smoke': (26, 17)}, 'arsen': {'smoke': (18, 14), 'drink': (29, 21)}}
+HAND = {'azat': {'smoke': (26, 17)}, 'arsen': {'smoke': (25, 15), 'drink': (29, 21)}}
 
 if __name__ == '__main__':
     main(sys.argv[1] if len(sys.argv) > 1 else None)
