@@ -35,7 +35,7 @@
   .stage{position:relative;width:200px;height:260px;flex:none;background:#5fb4ff;box-shadow:inset 0 0 0 4px #1a1024;overflow:hidden}
   .stage .sky{position:absolute;inset:4px;background:linear-gradient(#3d8ef0 0 30%,#5fb4ff 30% 60%,#9ad3ff 60%)}
   .stage .ground{position:absolute;left:4px;right:4px;bottom:4px;height:40px;background:#8a5a3c;box-shadow:inset 0 8px 0 #5bbf3a,inset 0 12px 0 #2f7d2a}
-  .stage canvas{position:absolute;left:5px;bottom:40px;width:190px;height:200px;image-rendering:pixelated}
+  .stage canvas{position:absolute;left:5px;bottom:40px;width:190px;height:209px;image-rendering:pixelated}
   .pick{display:flex;align-items:center;gap:10px;width:100%}
   .pick .b{padding:12px 14px 16px;font-size:12px}
   .pick .nm{flex:1;text-align:center;font-size:15px;color:#1a1024}
@@ -72,7 +72,7 @@
   .card.mini{flex-direction:column;align-items:stretch;gap:20px;min-width:320px;padding-top:40px}
   @media (max-width:760px),(max-height:520px){
     .card{gap:16px;padding:24px 20px}
-    .stage{width:130px;height:170px}.stage canvas{left:5px;width:120px;height:126px}.stage .it.ia{width:26px}.stage .it.ib{width:26px;top:96px}
+    .stage{width:130px;height:170px}.stage canvas{left:5px;width:120px;height:132px}.stage .it.ia{width:26px}.stage .it.ib{width:26px;top:96px}
     .logo .l1{font-size:28px}.logo .l2{font-size:11px;margin-top:16px}
     .side{min-width:0}.b{font-size:12px}
   }
@@ -88,7 +88,7 @@
 
 <div class="ov show" id="menu">
   <div class="card pxbox">
-    <div class="stage"><div class="sky"></div><div class="ground"></div><img class="it ia" id="mCan" alt=""><canvas id="hero" width="40" height="42"></canvas><img class="it ib" id="mPack" alt=""></div>
+    <div class="stage"><div class="sky"></div><div class="ground"></div><img class="it ia" id="mCan" alt=""><canvas id="hero" width="40" height="44"></canvas><img class="it ib" id="mPack" alt=""></div>
     <div class="side">
       <div class="logo"><span class="l1">SHAMPOO</span><span class="l2 pxbox">АЗАТ &amp; АРСЕН</span></div>
       <div class="tag">Беги по Еревану, собирай<br>BOOM, Adrenaline, VIP,<br>TEREA и шампунь!</div>
@@ -188,7 +188,7 @@ const CARS = {
 // ================= hero sprites: hand-built pixel rig based on Azat's and Arsen's sprite sheets =================
 // Head and torso are hand-pixelled templates (so faces stay readable); limbs are posed per frame with a
 // two-bone IK, which gives clean, smooth walk/run cycles. Everything faces right; the game mirrors it.
-const RIG_W = 34, RIG_H = 44, GROUND = 43, HIP_Y = 28;
+const RIG_W = 38, RIG_H = 46, GROUND = 45, HIP_Y = 28;
 const HEROPAL = {
   azat: {
     o: '#1a1024', H: '#4a2b1a', h: '#7a4a2c', d: '#2a170e', S: '#eab38c', s: '#c98a66', e: '#d69772', W: '#ffffff', E: '#1a1008',
@@ -205,83 +205,78 @@ const HEROPAL = {
     shoe: '#24242c', shoeS: '#3a3a46', sole: '#f0f0f2', lace: '#f4f4f4', watch: '#0c0c10', watchS: '#43e0ff'
   }
 };
-// heads: 16 wide, facing right. Letters map to HEROPAL keys, '.' is transparent.
+// heads: 13 wide x 14 tall, three-quarter view facing right (like the sprite sheets). Letters map to HEROPAL keys, '.' is transparent.
 const HEADS = {
   azat: [
-    '....ooooooo.....',
-    '..ooHhhhhhHoo...',
-    '.oHHHhhhhhhHHo..',
-    'oHHHHHHHHhhHHHo.',
-    'oHHdHHHHHHHHHHHo',
-    'oHdHHHHHHHHHHoo.',
-    'oHdHHSSSSSSSSo..',
-    'oHdHeSSddddSSo..',
-    '.oHHeSSSSWESSSo.',
-    '.oHdesSSSSSSSSo.',
-    '.oHBsSSSSSSSso..',
-    '.oBBBSBBBBBBBo..',
-    '.oBBBBBBMMBBBo..',
-    '..oBBBBBBBBBo...',
-    '...obBBBBBBo....',
-    '....obbbbbo.....'
+    '....ooooooo..',
+    '..ooHhhhhHHo.',
+    '.oHHhhhhHHHHo',
+    '.oHHHHHHHHHHo',
+    'oHHHdHHHHHHHo',
+    'oHHdSSSSSSSo.',
+    'oHdSddSSSddSo',
+    'oeSSWESSSWESo',
+    'oeSSSSSsSSSSo',
+    'oBSSSSsSSSSo.',
+    'oBBSBBBBBBBo.',
+    '.oBBBBBMMBBo.',
+    '..oBBBBBBBo..',
+    '...obbbbbo...'
   ],
   arsen: [
-    '.....oooooo.....',
-    '....oKKKKKKo....',
-    '...oKKKKKKwwo...',
-    '...oKkKKKKKwo...',
-    '..oKKKKKKKKKKo..',
-    '.ooKKKKKKKKKKoo.',
-    'oKKkkkkkkkkkkKKo',
-    '.oooSSSSSSSSoo..',
-    '...oHSSddddSo...',
-    '...oHeSSSWESSo..',
-    '...oHeSSSSSSSSo.',
-    '...oHgsSSSSSSo..',
-    '...oBBSBBBBBBo..',
-    '...oBBBBBMMBBo..',
-    '....oBBBBBBBo...',
-    '.....obbbbbo....'
+    '...ooooooo...',
+    '..oKKKKKwwo..',
+    '..oKkKKKKwo..',
+    '.oKKKKKKKKKo.',
+    'oKKKKKKKKKKKo',
+    'okkkkkkkkkkko',
+    '.oHSddSSSddo.',
+    '.oeSWESSSWEo.',
+    '.oeSSSSsSSSSo',
+    '.ogSSSsSSSSo.',
+    '.oBBSBBBBBBo.',
+    '.oBBBBBMMBBo.',
+    '..oBBBBBBBo..',
+    '...obbbbbo...'
   ]
 };
-// torso templates: 16 wide x 14 tall, shoulders on row 0, hem on the last row
+// torsos: 18 wide x 13 tall, puffy hoodie / open overshirt over the printed tee; hem on the last row
 const TORSOS = {
   azat: [
-    '...oooooooooo...',
-    '..oTTTTTTTTTTo..',
-    '.oTtTTTTTTTTTTo.',
-    'oTtTTTTTTTTTTTTo',
-    'oTtTTTTTqTTqTTTo',
-    'oTtTTTTTqTTqTTTo',
-    'oTtTTTTTqTTTTTTo',
-    'oTtTTTTTTTTTTTTo',
-    'oTtTTTtttttttTTo',
-    'oTtTTTtTTTTTtTTo',
-    'oTtTTTtTTTTTtTTo',
-    'oTttTTTTTTTTTTto',
-    'otttttttttttttto',
-    '.oooooooooooooo.'
+    '.....oooooooo.....',
+    '...ooTvvvvvvTTo...',
+    '..oTTTvTTTTvTTTo..',
+    '.oTTTTTvvvvvTTTTo.',
+    'oTtTTTTTqTTqTTTTTo',
+    'oTtTTTTTqTTqTTTTuo',
+    'oTtTTTTTqTTTTTTTuo',
+    'oTttTTTTTTTTTTTTTo',
+    'oTttTTTTTTTTTTTTto',
+    'oTttTTTTTTTTTTTTto',
+    '.oTttTTTTTTTTTTtto',
+    '.ottttttttttttttto',
+    '..oooooooooooooo..'
   ],
   arsen: [
-    '...oooooooooo...',
-    '..oTTTTnnTTTTo..',
-    '.oTTTTnnnnTTTTo.',
-    'oTtTTTn12nTTTTTo',
-    'oTtvvTn23nTvvTTo',
-    'oTtvvTn34nTvvTTo',
-    'oTtTTTnnnnTTTTTo',
-    'oTtTTTnnnnTTTTTo',
-    'oTtTTTnnnnTTTTTo',
-    'oTtTTTnnnnTTTTTo',
-    'oTtTTTnnnnTTTTTo',
-    'oTtTTTTnnTTTTTto',
-    'otttttttttttttto',
-    '.oooooooooooooo.'
+    '.....oooooooo.....',
+    '...ooTTTnnTTTTo...',
+    '..oTTTTnnnnnTTTo..',
+    '.oTTTTTn12nnTTTTo.',
+    'oTtvvTTn23nnTvvTTo',
+    'oTtvvTTn34nnTvvTTo',
+    'oTtTTTTnnnnnTTTTTo',
+    'oTtTTTTnnnnnTTTTTo',
+    'oTtTTTTnnnnnTTTTto',
+    'oTtTTTTnnnnnTTTTto',
+    '.oTtTTTnnnnnTTTtto',
+    '.otttttnnnnntttto.',
+    '..oooooooooooooo..'
   ]
 };
+const hexRGB = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 function heroPal(k) {
   const P = HEROPAL[k];
-  return Object.assign({}, P, { T: P.top, t: P.topS, q: P.str, n: P.tee || P.top, v: P.topD, '1': P.p1, '2': P.p2, '3': P.p3, '4': P.p4 });
+  return Object.assign({}, P, { T: P.top, t: P.topS, q: P.str, n: P.tee || P.top, v: P.topD, u: P.topH, '1': P.p1, '2': P.p2, '3': P.p3, '4': P.p4 });
 }
 function stamp(g, rows, pal, x0, y0) {
   for (let y = 0; y < rows.length; y++) for (let x = 0; x < rows[y].length; x++) {
@@ -308,17 +303,18 @@ function ik(ax, ay, bx, by, l1, l2, bend) {
 function drawShoe(g, P, x, y, back) {
   // chunky sneaker, toe to the right; (x, y) is the ankle
   const up = back ? P.shoeS : P.shoe;
-  g.fillStyle = P.o; g.fillRect(x - 3, y - 1, 10, 5);
-  g.fillStyle = up; g.fillRect(x - 2, y, 8, 2);
-  g.fillStyle = P.sole; g.fillRect(x - 2, y + 2, 8, 1);
-  g.fillStyle = P.lace; g.fillRect(x + 1, y, 3, 1);
-  if (P.shoe === '#24242c') { g.fillStyle = '#f4f4f4'; g.fillRect(x, y + 1, 4, 1); }   // Arsen's white stripe
+  g.fillStyle = P.o; g.fillRect(x - 4, y - 2, 12, 6); g.fillRect(x - 3, y - 3, 7, 1);
+  g.fillStyle = up; g.fillRect(x - 3, y - 2, 6, 1); g.fillRect(x - 3, y - 1, 10, 2);
+  g.fillStyle = P.sole; g.fillRect(x - 3, y + 1, 10, 2);
+  g.fillStyle = P.lace; g.fillRect(x + 1, y - 2, 3, 1);
+  g.fillStyle = P.shoeS; g.fillRect(x + 5, y - 1, 2, 1);
+  if (P.shoe === '#24242c') { g.fillStyle = '#f4f4f4'; g.fillRect(x - 1, y - 1, 5, 1); g.fillRect(x + 3, y - 2, 1, 1); }   // Arsen's white swoosh
 }
 function drawLeg(g, P, hip, foot, back) {
-  const [kx, ky] = ik(hip[0], hip[1], foot[0], foot[1], 7, 7, 1);
+  const [kx, ky] = ik(hip[0], hip[1], foot[0], foot[1], 8, 8, 1);
   const col = back ? P.pantsS : P.pants;
-  seg(g, hip[0], hip[1], kx, ky, 3, col, P.o);
-  seg(g, kx, ky, foot[0], foot[1] - 1, 3, col, P.o);
+  seg(g, hip[0], hip[1], kx, ky, 3.4, col, P.o);
+  seg(g, kx, ky, foot[0], foot[1] - 1, 3.2, col, P.o);
   if (!back) {
     g.fillStyle = P.pantsS; g.fillRect(Math.round(lerp(hip[0], kx, 0.5)) - 1, Math.round(lerp(hip[1], ky, 0.5)), 3, 3);   // cargo pocket
     g.fillStyle = P.pantsH; g.fillRect(Math.round(lerp(hip[0], kx, 0.5)) - 1, Math.round(lerp(hip[1], ky, 0.5)), 3, 1);
@@ -327,10 +323,10 @@ function drawLeg(g, P, hip, foot, back) {
   drawShoe(g, P, Math.round(foot[0]), Math.round(foot[1]), back);
 }
 function drawArm(g, P, sh, hand, back, opt = {}) {
-  const [ex, ey] = ik(sh[0], sh[1], hand[0], hand[1], 6, 6, opt.bend || -1);
+  const [ex, ey] = opt.pocket ? [lerp(sh[0], hand[0], 0.5), lerp(sh[1], hand[1], 0.5)] : ik(sh[0], sh[1], hand[0], hand[1], 6.5, 6.5, opt.bend || -1);   // hand in the pocket: straight arm
   const col = back ? P.topS : P.top;
-  seg(g, sh[0], sh[1], ex, ey, 1.8, col, P.o);
-  seg(g, ex, ey, hand[0], hand[1], 1.6, col, P.o);
+  seg(g, sh[0], sh[1], ex, ey, 2.4, col, P.o);
+  seg(g, ex, ey, hand[0], hand[1], 2.1, col, P.o);
   if (!back) { g.fillStyle = P.topH === '#ffffff' ? '#ffffff' : P.topH; g.fillRect(Math.round(sh[0]) - 1, Math.round(sh[1]) - 2, 2, 1); }
   if (opt.pocket) return;
   const hx = Math.round(hand[0]), hy = Math.round(hand[1]);
@@ -343,33 +339,43 @@ function rigFrame(k, o) {
   const P = heroPal(k);
   const c = document.createElement('canvas'); c.width = RIG_W; c.height = RIG_H;
   const g = c.getContext('2d');
-  const bob = o.bob || 0, lean = o.lean || 0, cx = 15;
+  const bob = o.bob || 0, lean = o.lean || 0, cx = 17;
   const hipY = HIP_Y + bob + (o.hipDrop || 0);
-  const hipF = [cx + 2, hipY], hipB = [cx - 2, hipY];
-  const tx = cx - 8 + lean, ty = hipY - 13;
-  const shF = [tx + 13 + (o.shF || 0), ty + 3], shB = [tx + 3, ty + 3];
+  const hipF = [cx + 3, hipY], hipB = [cx - 3, hipY];
+  const tx = cx - 9 + lean, ty = hipY - 12;
+  const shF = [tx + 14 + (o.shF || 0), ty + 4], shB = [tx + 4, ty + 4];
   // back limbs
-  drawLeg(g, P, hipB, [cx - 2 + o.lb[0], GROUND - 3 - o.lb[1] + (o.feetUp || 0)], true);
-  if (!o.noBack) drawArm(g, P, shB, [shB[0] + o.ab[0], shB[1] + o.ab[1]], true, { pocket: o.pocket, bend: o.abBend });
+  drawLeg(g, P, hipB, [cx - 3 + o.lb[0], GROUND - 3 - o.lb[1] + (o.feetUp || 0)], true);
+  if (!o.noBack && !(o.pocket && k === 'azat')) drawArm(g, P, shB, [shB[0] + o.ab[0], shB[1] + o.ab[1]], true, { pocket: o.pocket, bend: o.abBend });
   // torso + head
   stamp(g, TORSOS[k], P, tx, ty);
-  if (k === 'azat') { g.fillStyle = P.topS; g.fillRect(tx + 3, ty - 1, 9, 2); g.fillStyle = P.top; g.fillRect(tx + 4, ty - 1, 7, 1); }   // hood around the neck
-  drawLeg(g, P, hipF, [cx + 2 + o.lf[0], GROUND - 3 - o.lf[1] + (o.feetUp || 0)], false);
-  const hx = tx + (o.headX || 0) + (k === 'azat' ? 1 : 0), hy = ty - 14 + (o.headY || 0);
+  drawLeg(g, P, hipF, [cx + 3 + o.lf[0], GROUND - 3 - o.lf[1] + (o.feetUp || 0)], false);
+  const hx = tx + 4 + (o.headX || 0), hy = ty - 13 + (o.headY || 0);
   stamp(g, HEADS[k], P, hx, hy);
-  if (o.blink) { g.fillStyle = P.S; g.fillRect(hx + 10, hy + (k === 'azat' ? 8 : 9), 2, 1); g.fillStyle = P.s; g.fillRect(hx + 10, hy + (k === 'azat' ? 8 : 9), 2, 1); }
-  if (o.mouth) { g.fillStyle = '#3a0e0e'; g.fillRect(hx + 9, hy + (k === 'azat' ? 12 : 12), 3, 2); }
+  if (o.blink) { g.fillStyle = P.s; g.fillRect(hx + 4, hy + 7, 2, 1); g.fillRect(hx + 9, hy + 7, 2, 1); }
+  if (o.mouth) { g.fillStyle = '#3a0e0e'; g.fillRect(hx + 7, hy + 11, 2, 2); }
   // front arm on top
-  if (!o.noFront) drawArm(g, P, shF, [shF[0] + o.af[0], shF[1] + o.af[1]], false, { pocket: o.pocket, bend: o.afBend });
+  if (!o.noFront) {
+    // the near arm's dark rim becomes a soft fabric crease where it lies over the body, so it doesn't read as a strap
+    const before = g.getImageData(0, 0, RIG_W, RIG_H).data;
+    drawArm(g, P, shF, [shF[0] + o.af[0], shF[1] + o.af[1]], false, { pocket: o.pocket, bend: o.afBend });
+    const id = g.getImageData(0, 0, RIG_W, RIG_H), d = id.data, rim = hexRGB(P.o), soft = hexRGB(P.topS);
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i] !== rim[0] || d[i + 1] !== rim[1] || d[i + 2] !== rim[2] || !before[i + 3]) continue;
+      if (before[i] === rim[0] && before[i + 1] === rim[1] && before[i + 2] === rim[2]) continue;
+      d[i] = soft[0]; d[i + 1] = soft[1]; d[i + 2] = soft[2];
+    }
+    g.putImageData(id, 0, 0);
+  }
   if (o.extra) o.extra(g, P, shF, hx, hy);
-  return { c, ax: cx, hx: hx + 7, hy: hy };
+  return { c, ax: cx, hx: hx + 6, hy: hy };
 }
 const TAU = Math.PI * 2;
 function buildRig(k) {
   const F = {};
   const mk1 = o => rigFrame(k, o);
   // idle: hands resting by the pockets, slow breathing
-  F.IDLE = [0, 0, 1, 1].map((b, i) => mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], bob: b, headY: b ? 0 : 0, pocket: k === 'azat', blink: i === 3 }));
+  F.IDLE = [0, 0, 1, 1].map((b, i) => mk1({ lf: [2, 0], lb: [-2, 0], af: k === 'azat' ? [1, 10] : [0, 12], ab: [-1, 12], bob: b, headY: b ? 0 : 0, pocket: k === 'azat', blink: i === 3 }));
   // walk: 8 frames, contact/passing with knee IK; arms swing fully straight so the elbow never kinks across the chest
   const hang = x => [x, Math.round(Math.sqrt(Math.max(0, 145 - x * x)))];
   F.WALK = [];
@@ -378,7 +384,7 @@ function buildRig(k) {
     const lf = [Math.round(A * Math.cos(p)), Math.round(L * Math.max(0, -Math.sin(p)))];
     const lb = [Math.round(A * Math.cos(p + Math.PI)), Math.round(L * Math.max(0, -Math.sin(p + Math.PI)))];
     const bob = Math.abs(Math.cos(p)) > 0.7 ? 1 : 0;
-    F.WALK.push(mk1({ lf, lb, bob, af: hang(Math.round(-4 * Math.cos(p)) + 1), ab: hang(Math.round(4 * Math.cos(p)) - 1) }));
+    F.WALK.push(mk1({ lf, lb, bob, pocket: k === 'azat', af: k === 'azat' ? [1, 10] : hang(Math.round(-4 * Math.cos(p)) + 1), ab: hang(Math.round(4 * Math.cos(p)) - 1) }));
   }
   // run: longer stride, forward lean, pumping bent arms
   F.RUN = [];
@@ -397,17 +403,17 @@ function buildRig(k) {
   F.DROP = [mk1({ lf: [4, 0], lb: [-4, 0], af: [3, -12], ab: [-3, -11], hipDrop: 1, mouth: true }), mk1({ lf: [5, 0], lb: [-5, 0], af: [5, -13], ab: [-2, -12], mouth: true })];
   F.HURT = [mk1({ lf: [3, 1], lb: [-3, 0], af: [8, -1], ab: [-7, -5], lean: -1, headX: -1, blink: true, mouth: true })];
   F.DEAD = [mk1({ lf: [1, 0], lb: [-1, 0], af: [-1, 10], ab: [1, 10], blink: true })];
-  F.TALK = [mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], pocket: k === 'azat' }), mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], pocket: k === 'azat', mouth: true })];
+  F.TALK = [mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 10], ab: [-1, 12], pocket: k === 'azat' }), mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 10], ab: [-1, 12], pocket: k === 'azat', mouth: true })];
   // hand at the mouth: smoking / drinking; the cigarette is part of the frame, the can is drawn by the game
   const toMouth = (cig, puff) => mk1({ lf: [2, 0], lb: [-2, 0], ab: [-1, 10], af: [3, -4], afBend: -1, pocket: false,
-    extra: cig ? (g, P, sh, hx, hy) => { g.fillStyle = '#ffffff'; g.fillRect(hx + 12, hy + 12, 3, 1); g.fillStyle = puff ? '#ffd23a' : '#ff5a24'; g.fillRect(hx + 15, hy + 12, 1, 1); } : null });
+    extra: cig ? (g, P, sh, hx, hy) => { g.fillStyle = '#ffffff'; g.fillRect(hx + 9, hy + 11, 3, 1); g.fillStyle = puff ? '#ffd23a' : '#ff5a24'; g.fillRect(hx + 12, hy + 11, 1, 1); } : null });
   F.SMOKE = [toMouth(true, false), toMouth(true, true)];
   F.DRINK = [toMouth(false)];
   F.PHONE = [mk1({ lf: [2, 0], lb: [-2, 0], ab: [-1, 10], af: [5, 3], afBend: -1,
     extra: (g, P, sh) => { const x = Math.round(sh[0] + 5), y = Math.round(sh[1] + 1); g.fillStyle = '#0c0c10'; g.fillRect(x, y - 2, 3, 5); g.fillStyle = Math.floor(performance.now() / 300) % 2 ? '#43e0ff' : '#3a7bff'; g.fillRect(x + 1, y - 1, 1, 3); } })];
   // a relaxed idle smoke: leaning back a touch, other hand in the pocket
   F.CHILL = [mk1({ lf: [3, 0], lb: [-3, 0], ab: [-1, 10], af: [3, -4], pocket: false, lean: -1, headX: -1,
-    extra: (g, P, sh, hx, hy) => { g.fillStyle = '#ffffff'; g.fillRect(hx + 12, hy + 12, 3, 1); g.fillStyle = '#ff5a24'; g.fillRect(hx + 15, hy + 12, 1, 1); } })];
+    extra: (g, P, sh, hx, hy) => { g.fillStyle = '#ffffff'; g.fillRect(hx + 9, hy + 11, 3, 1); g.fillStyle = '#ff5a24'; g.fillRect(hx + 12, hy + 11, 1, 1); } })];
   return F;
 }
 const SPR = { azat: buildRig('azat'), arsen: buildRig('arsen') };
@@ -416,7 +422,7 @@ const POSE = {
   rise: ['JUMP', 0], apex: ['JUMP', 1], fall: ['FALL', 0], fall2: ['FALL', 1], land: ['LAND', 0], crouch: ['CROUCH', 0],
   phone: ['PHONE', 0], chill: ['CHILL', 0], drink: ['DRINK', 0], hurt: ['HURT', 0], dead: ['DEAD', 0]
 };
-const MOUTH = { azat: [3, -31], arsen: [2, -30] };
+const MOUTH = { azat: [2, -32], arsen: [2, -32] };
 // DJ gear: headphones drawn over the head of whatever frame is showing
 function drawPhones(f, fx, fy, dir) {
   if (!f) return;
@@ -1618,7 +1624,7 @@ const heroCtx = $('hero').getContext('2d');
 setInterval(() => {
   if (state !== 'menu' || !SPR[hero]) return;
   const L = SPR[hero].RUN, f = L[Math.floor(performance.now() / 110) % L.length];
-  heroCtx.clearRect(0, 0, 40, 42); heroCtx.drawImage(f.c, 20 - f.ax, 42 - f.c.height);
+  heroCtx.clearRect(0, 0, 40, 44); heroCtx.drawImage(f.c, 20 - f.ax, 44 - f.c.height);
 }, 35);
 function pickHero(d) {
   const ks = Object.keys(HEROES); hero = ks[(ks.indexOf(hero) + d + ks.length) % ks.length];
