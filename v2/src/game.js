@@ -214,9 +214,11 @@ function startDJ() {
   ents.fx.push({ name: 'wave', x: p.x + p.w / 2, y: p.y + p.h / 2, t: 0, r: 0 });
 }
 function shoot() {
-  const p = P; p.shoot = 0.24; p.shootCD = 0.28; sfx('shoot');
+  const p = P;
+  if (G.hero === 'vigen' && ents.shots.some(s => s.kind === 'wrench')) return; p.shoot = 0.24; p.shootCD = 0.28; sfx('shoot');
   const x = p.x + p.w / 2 + p.dir * 18, y = p.y + 16;
   if (G.hero === 'azat') ents.shots.push({ kind: 'disc', x, y, vx: p.dir * 330 + p.vx * 0.3, vy: -20, t: 0 });
+  else if (G.hero === 'vigen') ents.shots.push({ kind: 'wrench', x, y: y + 6, vx: p.dir * 430 + p.vx * 0.3, vy: 0, t: 0, back: false, hit: [] });
   else ents.shots.push({ kind: 'note', x, y, vx: p.dir * 280 + p.vx * 0.3, vy: 0, t: 0 });
 }
 
@@ -357,12 +359,13 @@ export function killFoe(e, stomp) {
 function updateShots(dt) {
   const W = G.world, p = P;
   for (const s of ents.shots) {
+    if (s.kind === 'wrench') { wrench(s, dt); continue; }
     s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt;
     if (s.kind === 'note') s.y += Math.sin(s.t * 18) * 1.2;
     if (W.solid(Math.floor(s.x / T), Math.floor(s.y / T))) { s.t = 9; fx('fx_hit', s.x, s.y); }
     for (const e of ents.foes) if (e.alive && s.x > e.x - 4 && s.x < e.x + e.w + 4 && s.y > e.y - 4 && s.y < e.y + e.h + 4) { killFoe(e, false); s.t = 9; break; }
   }
-  ents.shots = ents.shots.filter(s => s.t < 1.4);
+  ents.shots = ents.shots.filter(s => s.t < (s.kind === 'wrench' ? 9 : 1.4));
   for (const b of ents.bad) {
     b.t += dt; b.vy += (b.g || 300) * dt; b.x += b.vx * dt; b.y += b.vy * dt;
     if (G.state === 'play' && b.x > p.x - 3 && b.x < p.x + p.w + 3 && b.y > p.y && b.y < p.y + p.h) {
@@ -372,6 +375,23 @@ function updateShots(dt) {
     if (W.solid(Math.floor(b.x / T), Math.floor(b.y / T))) { b.t = 9; if (b.kind === 'poop') { fx('poop_splat', b.x, Math.floor(b.y / T) * T); sfx('splat'); } else dust(b.x, b.y, 3); }
   }
   ents.bad = ents.bad.filter(b => b.t < 3);
+}
+
+// Vigen's wrench: flies out, slows, then homes back to his hand like a boomerang, knocking out
+// everything it passes on the way there and back; a wall just turns it around early
+function wrench(s, dt) {
+  const W = G.world, p = P, hx = p.x + p.w / 2, hy = p.y + 22;
+  s.t += dt;
+  if (!s.back) {
+    s.vx -= Math.sign(s.vx) * 600 * dt;
+    if (s.t > 0.62 || Math.abs(s.vx) < 60 || W.solid(Math.floor((s.x + Math.sign(s.vx) * 6) / T), Math.floor(s.y / T))) { s.back = true; s.hit = []; }
+  } else {
+    const dx = hx - s.x, dy = hy - s.y, d = Math.hypot(dx, dy) || 1, sp = Math.min(420, 160 + s.t * 300);
+    s.vx += (dx / d * sp - s.vx) * Math.min(1, dt * 8); s.vy += (dy / d * sp - s.vy) * Math.min(1, dt * 8);
+    if (d < 14 || s.t > 3) { s.t = 99; sfx('click'); return; }
+  }
+  s.x += s.vx * dt; s.y += s.vy * dt;
+  for (const e of ents.foes) if (e.alive && !s.hit.includes(e) && s.x > e.x - 7 && s.x < e.x + e.w + 7 && s.y > e.y - 8 && s.y < e.y + e.h + 8) { s.hit.push(e); killFoe(e, false); }
 }
 
 // ---------------- fx ----------------

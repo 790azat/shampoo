@@ -117,7 +117,7 @@ function drawEntities(ctx) {
   const vx0 = cam.x - 80, vx1 = cam.x + VIEW.w + 80, vis = x => x > vx0 && x < vx1;
   for (const d of ents.decor) if (vis(d.x)) draw(ctx, DECOR[d.ch], d.ch === 'f' ? frameAt('prop_fountain', G.t) : 0, d.x, d.y);
   if (vis(G.car.x)) {
-    const car = G.hero === 'azat' ? 'car_teana' : 'car_focus';
+    const car = { azat: 'car_teana', arsen: 'car_focus' }[G.hero];
     const s = SPR[car]; if (s) draw(ctx, car, 0, G.car.x + s.anchor[0] - 6, G.car.y);
   }
   for (const f of ents.flags) if (vis(f.x)) {
@@ -189,7 +189,8 @@ function ghost() {
 }
 function drawShots(ctx) {
   for (const s of ents.shots) {
-    if (s.kind === 'disc') { if (!draw(ctx, 'disc_spin', frameAt('disc_spin', s.t * 2), s.x, s.y + 6)) { ctx.fillStyle = '#222'; ctx.fillRect(s.x - 5, s.y - 5, 10, 10); } }
+    if (s.kind === 'wrench') { if (!draw(ctx, 'wrench_spin', frameAt('wrench_spin', s.t), s.x, s.y + 7, s.vx < 0 ? -1 : 1)) { ctx.fillStyle = '#ccd'; ctx.fillRect(s.x - 5, s.y - 2, 10, 4); } }
+    else if (s.kind === 'disc') { if (!draw(ctx, 'disc_spin', frameAt('disc_spin', s.t * 2), s.x, s.y + 6)) { ctx.fillStyle = '#222'; ctx.fillRect(s.x - 5, s.y - 5, 10, 10); } }
     else if (!draw(ctx, 'note', frameAt('note', s.t), s.x, s.y + 6, Math.sign(s.vx))) { ctx.fillStyle = '#43e0ff'; ctx.fillRect(s.x - 3, s.y - 5, 6, 10); }
   }
   for (const b of ents.bad) {

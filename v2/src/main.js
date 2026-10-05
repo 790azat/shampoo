@@ -22,7 +22,7 @@ function resize() {
 addEventListener('resize', resize); resize();
 
 // ---------------- screens ----------------
-const HEROES = ['azat', 'arsen'], NAMES = { azat: 'АЗАТ', arsen: 'АРСЕН' };
+const HEROES = ['azat', 'arsen', 'vigen'], NAMES = { azat: 'АЗАТ', arsen: 'АРСЕН', vigen: 'ВИГЕН' };
 let heroIdx = 0;
 try { heroIdx = Math.max(0, HEROES.indexOf(localStorage.getItem('shampoo2_hero'))); } catch (e) {}
 const screens = ['menu', 'levelsScr', 'helpScr', 'pauseScr', 'endScr'];
@@ -131,7 +131,7 @@ function pollInputEdgesClear() { for (const k in input.pressed) input.pressed[k]
 
 // ---------------- boot ----------------
 (async () => {
-  await Promise.all(['heroes', 'actors', 'objects', 'boss'].map(loadManifest));
+  await Promise.all(['heroes', 'vigen', 'actors', 'objects', 'boss'].map(loadManifest));
   // a backdrop for the menu: the first district
   await loadWorld(LEVELS[0].id);
   refreshMenu();
