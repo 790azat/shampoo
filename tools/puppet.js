@@ -28,13 +28,32 @@ function pupFrame(k, o) {
   const hc = [(J.hipB[0] + J.hipF[0]) / 2, J.hipB[1]], lean = o.lean || 0, bob = o.bob || 0, tilt = o.tilt || 0;
   // breathing: the torso stretches up from the hips by br pixels and the head rides on top
   const br = o.breath || 0, hdy = bob + (o.headY || 0) - br;
-  g.save(); g.translate(Math.round(OX + hc[0]), Math.round(OY + hc[1] + bob)); g.rotate(lean); g.scale(1, 1 + br / (hc[1] - D.torso.y)); g.translate(-hc[0], -hc[1]); g.drawImage(D.torso.img, D.torso.x, D.torso.y); g.restore();
+  g.save(); g.translate(Math.round(OX + hc[0]), Math.round(OY + hc[1] + bob)); g.rotate(lean); g.scale(1, 1 + br / (hc[1] - D.torso.y)); g.translate(-hc[0], -hc[1]); g.drawImage(o.arm ? armTorso(k) : D.torso.img, D.torso.x, D.torso.y); g.restore();
   const nk = rot(J.neck, hc, lean), ha = lean + tilt;
   put(D.head, nk, J.neck, ha, hdy, null, HEAD_S);
   const sN = p => [J.neck[0] + (p[0] - J.neck[0]) * HEAD_S, J.neck[1] + (p[1] - J.neck[1]) * HEAD_S], m = rot(sN(PUP_MOUTH[k]), J.neck, ha), mx = OX + nk[0] + (m[0] - J.neck[0]), my = OY + nk[1] + (m[1] - J.neck[1]) + hdy;
   const hd = D.head, ea = rot(sN([hd.x + PUP_EAR[k][0], hd.y + PUP_EAR[k][1]]), J.neck, ha), ex = OX + nk[0] + (ea[0] - J.neck[0]), ey = OY + nk[1] + (ea[1] - J.neck[1]) + hdy;
   if (o.deco !== false && o.mouth) { g.fillStyle = '#3a0e0e'; g.fillRect(Math.round(mx) - 2, Math.round(my), 4, 3); }
   if (o.deco !== false && o.cig) { g.fillStyle = '#f4f4f4'; g.fillRect(Math.round(mx) + 1, Math.round(my) + 1, 8, 2); g.fillStyle = o.cig === 2 ? '#ffd23a' : '#ff5a24'; g.fillRect(Math.round(mx) + 9, Math.round(my) + 1, 2, 2); }
+  // raised front arm (lighting up, drinking): two-bone IK from the shoulder to a point near the mouth or chest
+  let hand = null;
+  if (o.arm) {
+    const A = ARM[k], sy = 1 + br / (hc[1] - D.torso.y);
+    const tp = p => { const q = [p[0] - hc[0], (p[1] - hc[1]) * sy], c = Math.cos(lean), s = Math.sin(lean); return [OX + hc[0] + q[0] * c - q[1] * s, OY + hc[1] + bob + q[0] * s + q[1] * c]; };
+    const S = tp([D.torso.x + A.sh[0], D.torso.y + A.sh[1]]);
+    const T = o.arm.at === 'mouth' ? [mx + 4, my + 3] : o.arm.at === 'can' ? [mx + 7, my + 1] : [mx - 2, my + 26];
+    const dx = T[0] - S[0], dy = T[1] - S[1], d = Math.min(Math.hypot(dx, dy), A.L1 + A.L2 - 0.5), a = Math.atan2(dy, dx);
+    const b = Math.acos(Math.max(-1, Math.min(1, (A.L1 * A.L1 + d * d - A.L2 * A.L2) / (2 * A.L1 * d))));
+    const e1 = [S[0] + A.L1 * Math.cos(a + b), S[1] + A.L1 * Math.sin(a + b)], e2 = [S[0] + A.L1 * Math.cos(a - b), S[1] + A.L1 * Math.sin(a - b)];
+    const E = e1[1] > e2[1] ? e1 : e2, ea2 = Math.atan2(T[1] - E[1], T[0] - E[0]), H = [E[0] + A.L2 * Math.cos(ea2), E[1] + A.L2 * Math.sin(ea2)];
+    const line = (w, col) => { g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(S[0], S[1]); g.lineTo(E[0], E[1]); g.lineTo(H[0] - Math.cos(ea2) * 3, H[1] - Math.sin(ea2) * 3); g.stroke(); };
+    line(A.w + 3, A.dark); if (A.rim) { g.save(); g.translate(1.5, -1); line(A.w + 1, A.rim); g.restore(); } line(A.rim ? A.w - 1 : A.w, A.shade); g.save(); g.translate(-1, -1.5); line(A.w * 0.6, A.col); g.restore();
+    if (A.watch) { g.fillStyle = '#141018'; g.save(); g.translate(H[0] - Math.cos(ea2) * 4, H[1] - Math.sin(ea2) * 4); g.rotate(ea2); g.fillRect(-1.5, -3.5, 3, 7); g.restore(); }
+    g.fillStyle = '#4a2418'; g.beginPath(); g.arc(H[0], H[1], 5.5, 0, TAU); g.fill();
+    g.fillStyle = '#e2a47e'; g.beginPath(); g.arc(H[0], H[1], 4.2, 0, TAU); g.fill();
+    g.fillStyle = '#f4c4a0'; g.beginPath(); g.arc(H[0] - 1, H[1] - 1.5, 1.8, 0, TAU); g.fill();
+    hand = H;
+  }
   // feet on the ground: the frame ends at its lowest opaque row (airborne frames keep the standing baseline)
   let bottom = Math.round(OY + D.ground) + 1;
   if (o.grounded !== false) {
@@ -43,7 +62,21 @@ function pupFrame(k, o) {
   }
   const out = document.createElement('canvas'); out.width = W; out.height = bottom; out.getContext('2d').drawImage(c, 0, 0);
   const hcx = OX + nk[0] + (hd.x + hd.w / 2 - J.neck[0]) * HEAD_S;
-  return { c: out, ax: OX + hc[0], k: K, hx: hcx, hy: OY + nk[1] + (hd.y - J.neck[1]) * HEAD_S + hdy, hw: hd.w * HEAD_S, hh: hd.h * HEAD_S, mx, my, ex, ey, o };
+  return { c: out, ax: OX + hc[0], k: K, hx: hcx, hy: OY + nk[1] + (hd.y - J.neck[1]) * HEAD_S + hdy, hw: hd.w * HEAD_S, hh: hd.h * HEAD_S, hand, mx, my, ex, ey, o };
+}
+// the raised front arm: shoulder in torso-part pixels, bone lengths, sleeve width and colours
+const ARM = {
+  azat: { sh: [53, 15], L1: 21, L2: 19, w: 12, col: '#f1e6da', shade: '#cdbcab', dark: '#5e4c44', watch: true },
+  arsen: { sh: [66, 12], L1: 22, L2: 20, w: 12, col: '#5a5262', shade: '#2e2934', dark: '#0c0a0e', rim: '#c47a3c', pocket: [58, 44, 14, 18], fill: '#221e27' }
+};
+// torso with the front hand taken out of the pocket (that arm is drawn raised instead)
+function armTorso(k) {
+  const D = PUP[k], A = ARM[k];
+  if (D.torsoArm) return D.torsoArm;
+  const c = document.createElement('canvas'); c.width = D.torso.w; c.height = D.torso.h; const g = c.getContext('2d');
+  g.drawImage(D.torso.img, 0, 0);
+  if (A.pocket) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = A.fill; g.fillRect(...A.pocket); }
+  return (D.torsoArm = c);
 }
 function buildPuppet(k) {
   const F = {}, mk1 = o => pupFrame(k, Object.assign({ deco: false }, o));
@@ -65,8 +98,32 @@ function buildPuppet(k) {
   F.HURT = [mk1({ tF: 0.2, sF: 0.3, tB: 0.1, lean: -0.22, tilt: -0.25, mouth: true })];
   F.DEAD = [mk1({ tilt: 0.15 })];
   F.TALK = [mk1({ tF: -0.04, tB: 0.04, breath: 4 }), mk1({ tF: -0.04, tB: 0.04, breath: 4, mouth: true })];
-  F.SMOKE = [mk1({ tF: -0.04, tB: 0.04, tilt: -0.04, cig: 1 }), mk1({ tF: -0.04, tB: 0.04, tilt: -0.08, breath: 8, cig: 2 })];
-  F.DRINK = [mk1({ tF: -0.04, tB: 0.04, lean: -0.05, tilt: -0.3 })];
+  // lighting up: raise the cigarette, flick the lighter, drag, take it out, exhale
+  const st = o => mk1(Object.assign({ tF: -0.04, tB: 0.04 }, o));
+  F.SMOKE = [
+    st({ arm: { at: 'chest', obj: 'cig' } }),
+    st({ arm: { at: 'mouth', obj: 'lighter' }, cig: 1, tilt: -0.04 }),
+    st({ arm: { at: 'mouth', obj: 'lighter', flame: 1 }, cig: 1, tilt: -0.06 }),
+    st({ arm: { at: 'mouth', obj: 'lighter', flame: 2 }, cig: 2, tilt: -0.06, breath: 4 }),
+    st({ arm: { at: 'chest', obj: null }, cig: 2, tilt: -0.1, breath: 8 }),
+    st({ arm: { at: 'mouth', obj: 'cigHand' }, breath: 6 }),
+    st({ arm: { at: 'chest', obj: 'cigHand' }, mouth: true, tilt: -0.12, breath: 2 })
+  ];
+  // the IQOS stick: no lighter, just a few drags
+  F.VAPE = [
+    st({ arm: { at: 'chest', obj: 'stick' } }),
+    st({ arm: { at: 'mouth', obj: 'stick' }, tilt: -0.04 }),
+    st({ arm: { at: 'mouth', obj: 'stick' }, tilt: -0.08, breath: 6 }),
+    st({ arm: { at: 'chest', obj: 'stick' }, mouth: true, tilt: -0.12, breath: 2 })
+  ];
+  // drinking the can: lift, tip it, two gulps with the head back, lower
+  F.DRINK = [
+    st({ arm: { at: 'chest', obj: 'can' } }),
+    st({ arm: { at: 'can', obj: 'can', tip: 0.6 }, tilt: -0.15 }),
+    st({ arm: { at: 'can', obj: 'can', tip: 1.1 }, tilt: -0.3, lean: -0.05 }),
+    st({ arm: { at: 'can', obj: 'can', tip: 1.2 }, tilt: -0.34, lean: -0.06, breath: 4 }),
+    st({ arm: { at: 'chest', obj: 'can' }, mouth: true, breath: 2 })
+  ];
   F.PHONE = [mk1({ tF: -0.04, tB: 0.04, tilt: 0.22 })];
   F.CHILL = BR.map((b, i) => mk1({ tF: -0.1, tB: 0.12, lean: -0.05, tilt: -0.06, breath: b, cig: i === 2 ? 2 : 1 }));
   return F;

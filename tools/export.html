@@ -6,7 +6,7 @@ loadPuppets();
 window.exportFrames = () => new Promise(res => {
   const wait = () => { if (!SPR.azat || !SPR.arsen) return setTimeout(wait, 50);
     const out = {};
-    for (const h in SPR) { out[h] = {}; for (const n in SPR[h]) out[h][n] = SPR[h][n].map(f => ({ png: f.c.toDataURL(), w: f.c.width, h: f.c.height, ax: f.ax, hx: f.hx, hy: f.hy, hw: f.hw, hh: f.hh, mx: f.mx, my: f.my, ex: f.ex, ey: f.ey, o: f.o })); }
+    for (const h in SPR) { out[h] = {}; for (const n in SPR[h]) out[h][n] = SPR[h][n].map(f => ({ png: f.c.toDataURL(), w: f.c.width, h: f.c.height, ax: f.ax, hx: f.hx, hy: f.hy, hw: f.hw, hh: f.hh, mx: f.mx, my: f.my, ex: f.ex, ey: f.ey, hand: f.hand, o: f.o })); }
     res(out); };
   wait();
 });

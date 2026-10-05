@@ -64,6 +64,24 @@ def run(src, out_dir):
                 if o.get('cig'):
                     out[my, mx:mx + 3] = (244, 244, 244, 255)
                     out[my, mx + 3] = (255, 210, 58, 255) if o['cig'] == 2 else (255, 90, 36, 255)
+                arm = o.get('arm') or {}
+                hx2 = hy2 = -1
+                if f.get('hand'):
+                    hx2, hy2 = round(f['hand'][0] * sx), round(f['hand'][1] * sy)
+                    ob = arm.get('obj')
+                    def put(x, y, c):
+                        if 0 <= y < H1 and 0 <= x < W1: out[y, x] = (*c, 255)
+                    if ob == 'cig' or ob == 'cigHand':
+                        for i in range(1, 4): put(hx2 + i, hy2 - 1, (244, 244, 244))
+                        put(hx2 + 4, hy2 - 1, (255, 90, 36))
+                    elif ob == 'stick':
+                        for i in range(1, 3): put(hx2 + i, hy2 - 1, (240, 226, 190))
+                        put(hx2 + 3, hy2 - 1, (196, 154, 116))
+                    elif ob == 'lighter':
+                        put(hx2, hy2 - 1, (200, 30, 40)); put(hx2, hy2 - 2, (200, 30, 40))
+                        if arm.get('flame'):
+                            put(hx2, hy2 - 3, (255, 210, 58)); put(hx2, hy2 - 4, (255, 140, 30) if arm['flame'] == 2 else (255, 240, 160))
+                            if arm['flame'] == 2: put(hx2 + 1, hy2 - 3, (255, 240, 160))
                 full = out[..., 3] > 0
                 ol = np.zeros_like(full)
                 ol[1:] |= full[:-1]; ol[:-1] |= full[1:]; ol[:, 1:] |= full[:, :-1]; ol[:, :-1] |= full[:, 1:]
@@ -74,7 +92,7 @@ def run(src, out_dir):
                     bottom = round(f['h'] * sy)
                 tiles.append(Image.fromarray(out[:bottom]))
                 meta[name].append([round(f['ax'] * sx, 1), bottom, round(f['hx'] * sx, 1), round(f['hy'] * sy, 1), round(f['hw'] * sx, 1),
-                                   round(f['hh'] * sy, 1), round(f['mx'] * sx, 1), round(f['my'] * sy, 1), round(f['ex'] * sx, 1), round(f['ey'] * sy, 1)])
+                                   round(f['hh'] * sy, 1), round(f['mx'] * sx, 1), round(f['my'] * sy, 1), round(f['ex'] * sx, 1), round(f['ey'] * sy, 1), hx2, hy2, arm.get('tip', 0)])
         sheet = Image.new('RGBA', (W1 * len(tiles), max(t.height for t in tiles)))
         for i, t in enumerate(tiles): sheet.paste(t, (i * W1, 0))
         buf = io.BytesIO(); sheet.save(buf, 'PNG', optimize=True)
