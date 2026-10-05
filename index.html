@@ -369,15 +369,16 @@ function buildRig(k) {
   const F = {};
   const mk1 = o => rigFrame(k, o);
   // idle: hands resting by the pockets, slow breathing
-  F.IDLE = [0, 0, 1, 1].map((b, i) => mk1({ lf: [2, 0], lb: [-2, 0], af: [0, 10], ab: [0, 10], bob: b, headY: b ? 0 : 0, pocket: k === 'azat', blink: i === 3 }));
-  // walk: 8 frames, contact/passing with knee IK
+  F.IDLE = [0, 0, 1, 1].map((b, i) => mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], bob: b, headY: b ? 0 : 0, pocket: k === 'azat', blink: i === 3 }));
+  // walk: 8 frames, contact/passing with knee IK; arms swing fully straight so the elbow never kinks across the chest
+  const hang = x => [x, Math.round(Math.sqrt(Math.max(0, 145 - x * x)))];
   F.WALK = [];
   for (let i = 0; i < 8; i++) {
     const p = i / 8 * TAU, A = 5, L = 3;
     const lf = [Math.round(A * Math.cos(p)), Math.round(L * Math.max(0, -Math.sin(p)))];
     const lb = [Math.round(A * Math.cos(p + Math.PI)), Math.round(L * Math.max(0, -Math.sin(p + Math.PI)))];
     const bob = Math.abs(Math.cos(p)) > 0.7 ? 1 : 0;
-    F.WALK.push(mk1({ lf, lb, bob, af: [Math.round(-4 * Math.cos(p)) + 1, 10], ab: [Math.round(4 * Math.cos(p)) - 1, 10] }));
+    F.WALK.push(mk1({ lf, lb, bob, af: hang(Math.round(-4 * Math.cos(p)) + 1), ab: hang(Math.round(4 * Math.cos(p)) - 1) }));
   }
   // run: longer stride, forward lean, pumping bent arms
   F.RUN = [];
@@ -394,9 +395,9 @@ function buildRig(k) {
   F.CROUCH = [mk1({ lf: [5, 0], lb: [-4, 0], hipDrop: 7, af: [6, 6], ab: [-3, 7], lean: 1, headX: 1 })];
   F.SHOOT = [mk1({ lf: [4, 0], lb: [-4, 0], af: [3, 4], ab: [-3, 8], lean: -1 }), mk1({ lf: [5, 0], lb: [-5, 0], af: [12, 0], ab: [-4, 7], lean: 1, headX: 1, afBend: 1 })];
   F.DROP = [mk1({ lf: [4, 0], lb: [-4, 0], af: [3, -12], ab: [-3, -11], hipDrop: 1, mouth: true }), mk1({ lf: [5, 0], lb: [-5, 0], af: [5, -13], ab: [-2, -12], mouth: true })];
-  F.HURT = [mk1({ lf: [-2, 2], lb: [3, 1], af: [-5, -6], ab: [-7, -4], lean: -2, headX: -2, blink: true, mouth: true })];
+  F.HURT = [mk1({ lf: [3, 1], lb: [-3, 0], af: [8, -1], ab: [-7, -5], lean: -1, headX: -1, blink: true, mouth: true })];
   F.DEAD = [mk1({ lf: [1, 0], lb: [-1, 0], af: [-1, 10], ab: [1, 10], blink: true })];
-  F.TALK = [mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 10], ab: [-1, 10], pocket: k === 'azat' }), mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 10], ab: [-1, 10], pocket: k === 'azat', mouth: true })];
+  F.TALK = [mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], pocket: k === 'azat' }), mk1({ lf: [2, 0], lb: [-2, 0], af: [1, 12], ab: [-1, 12], pocket: k === 'azat', mouth: true })];
   // hand at the mouth: smoking / drinking; the cigarette is part of the frame, the can is drawn by the game
   const toMouth = (cig, puff) => mk1({ lf: [2, 0], lb: [-2, 0], ab: [-1, 10], af: [3, -4], afBend: -1, pocket: false,
     extra: cig ? (g, P, sh, hx, hy) => { g.fillStyle = '#ffffff'; g.fillRect(hx + 12, hy + 12, 3, 1); g.fillStyle = puff ? '#ffd23a' : '#ff5a24'; g.fillRect(hx + 15, hy + 12, 1, 1); } : null });
