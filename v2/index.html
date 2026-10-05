@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1a1024">
+<title>SHAMPOO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root { --ol: #1a1024; --gold: #ffd23a; --orange: #ff8a1e; --cream: #f6ecd8; --blue: #3a62cc; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #1a1024; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+  body { font-family: 'Press Start 2P', monospace; color: #fff; }
+  canvas#c { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
+  .scr { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(26, 16, 36, .55); z-index: 5; }
+  .scr.show { display: flex; }
+  .card { background: var(--cream); color: var(--ol); border: 4px solid var(--ol); box-shadow: 0 6px 0 var(--ol), inset 0 -6px 0 #e2d2b4; padding: 22px 26px 26px; max-width: min(94vw, 760px); max-height: 94vh; overflow: auto; position: relative; }
+  .card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: linear-gradient(90deg, #d90012 33.3%, #0033a0 33.3% 66.6%, #f2a800 66.6%); }
+  .row { display: flex; gap: 22px; align-items: center; }
+  h1 { margin: 6px 0 4px; font-size: 52px; color: var(--gold); letter-spacing: 2px; text-shadow: 4px 4px 0 var(--ol), -2px -2px 0 var(--ol), 2px -2px 0 var(--ol), -2px 2px 0 var(--ol), 0 8px 0 #b5531a; }
+  h2 { margin: 0 0 14px; font-size: 22px; color: var(--ol); }
+  .tag { display: inline-block; background: var(--blue); color: #fff; font-size: 11px; padding: 7px 10px; border: 3px solid var(--ol); margin-bottom: 12px; }
+  p { font-size: 10px; line-height: 1.8; margin: 0 0 14px; }
+  .b { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; font: inherit; font-size: 13px; padding: 12px 14px; margin: 8px 0 0; background: #fff; color: var(--ol); border: 3px solid var(--ol); box-shadow: 0 4px 0 var(--ol); cursor: pointer; }
+  .b.main { background: var(--orange); color: #fff; text-shadow: 2px 2px 0 var(--ol); }
+  .b:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ol); }
+  .b:focus-visible { outline: 3px solid var(--blue); }
+  .sel { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .sel .b { width: 44px; justify-content: center; margin: 0; }
+  .sel .name { flex: 1; text-align: center; font-size: 13px; }
+  .stage { width: 200px; height: 220px; border: 4px solid var(--ol); background: linear-gradient(#7cc4ff 0 62%, #f0c9a0 62% 70%, #c9774f 70%); position: relative; flex: none; overflow: hidden; }
+  .stage canvas { position: absolute; left: 0; bottom: 0; width: 200px; height: 220px; image-rendering: pixelated; }
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+  .levels .b { margin: 0; font-size: 9px; padding: 10px 8px; flex-direction: column; align-items: flex-start; }
+  .levels .b[disabled] { opacity: .45; cursor: default; }
+  .small { font-size: 9px; opacity: .8; margin-top: 12px; line-height: 1.8; }
+  .stats { font-size: 11px; line-height: 2; margin: 6px 0 10px; }
+  .hudbtn { position: fixed; top: max(8px, env(safe-area-inset-top)); z-index: 4; width: 40px; height: 40px; background: rgba(26,16,36,.7); border: 3px solid #fff; color: #fff; font: inherit; font-size: 14px; display: none; align-items: center; justify-content: center; }
+  #pauseBtn { right: max(8px, env(safe-area-inset-right)); }
+  #muteBtn { right: calc(max(8px, env(safe-area-inset-right)) + 48px); }
+  body.playing .hudbtn { display: flex; }
+  #touch { position: fixed; inset: 0; z-index: 3; display: none; pointer-events: none; }
+  body.touch.playing #touch { display: block; }
+  #touch .t { position: absolute; bottom: max(10px, env(safe-area-inset-bottom)); width: 66px; height: 66px; border: 3px solid rgba(255,255,255,.5); background: rgba(26,16,36,.22); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; pointer-events: auto; border-radius: 10px; }
+  #touch .t.on { background: rgba(255,210,58,.5); }
+  #touch .zone { position: absolute; inset: 0; pointer-events: none; }
+  #rot { position: fixed; inset: 0; z-index: 20; background: var(--ol); display: none; align-items: center; justify-content: center; text-align: center; font-size: 12px; line-height: 2; padding: 30px; }
+  @media (orientation: portrait) and (max-width: 700px) { body.touch #rot { display: flex; } }
+  @media (max-height: 520px) {
+    h1 { font-size: 30px; } .card { padding: 14px 16px 16px; } .stage { width: 120px; height: 132px; } .stage canvas { width: 120px; height: 132px; }
+    .b { font-size: 11px; padding: 9px 10px; } p { margin-bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="scr show" id="menu"><div class="card">
+  <div class="row">
+    <div>
+      <div class="stage"><canvas id="preview" width="100" height="110"></canvas></div>
+      <div class="sel"><button class="b" data-act="prev">◀</button><div class="name" id="heroName">АЗАТ</div><button class="b" data-act="next">▶</button></div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <h1>SHAMPOO</h1>
+      <div class="tag">АЗАТ &amp; АРСЕН</div>
+      <p>Беги через весь Ереван, собирай BOOM, Adrenaline, VIP, TEREA и шампунь. Набери DJ и разнеси всех!</p>
+      <button class="b main" data-act="play"><span>ИГРАТЬ</span><span>▶</span></button>
+      <button class="b" data-act="levels"><span>УРОВНИ</span><span>☰</span></button>
+      <button class="b" data-act="help"><span>УПРАВЛЕНИЕ</span><span>?</span></button>
+      <div class="small" id="best"></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="scr" id="levelsScr"><div class="card" style="min-width:min(94vw,560px)">
+  <h2>РАЙОНЫ ЕРЕВАНА</h2>
+  <div class="levels" id="levelList"></div>
+  <button class="b" data-act="back"><span>НАЗАД</span><span>◀</span></button>
+</div></div>
+
+<div class="scr" id="helpScr"><div class="card" style="max-width:min(94vw,560px)">
+  <h2>УПРАВЛЕНИЕ</h2>
+  <p>← → / A D — бег<br>ПРОБЕЛ / Z / ↑ — прыжок (держи — выше)<br>↓ — присесть, ↓ + прыжок — спрыгнуть с полки<br>C / K — включить DJ, когда шкала полная<br>X / J — стрелять в DJ-режиме<br>ESC — пауза</p>
+  <p>Прыгай врагам на голову. Голуби гадят сверху, бабушка кидает тапок, курьер на самокате не тормозит. Флаг — чекпоинт.</p>
+  <button class="b" data-act="back"><span>ПОНЯТНО</span><span>◀</span></button>
+</div></div>
+
+<div class="scr" id="pauseScr"><div class="card" style="min-width:min(90vw,380px)">
+  <h2>ПАУЗА</h2>
+  <button class="b main" data-act="resume"><span>ДАЛЬШЕ</span><span>▶</span></button>
+  <button class="b" data-act="restart"><span>ЗАНОВО</span><span>↺</span></button>
+  <button class="b" data-act="menu"><span>В МЕНЮ</span><span>☰</span></button>
+</div></div>
+
+<div class="scr" id="endScr"><div class="card" style="min-width:min(90vw,420px)">
+  <h2 id="endTitle">ФИНИШ!</h2>
+  <div class="stats" id="endStats"></div>
+  <button class="b main" data-act="next2" id="nextBtn"><span>ДАЛЬШЕ</span><span>▶</span></button>
+  <button class="b" data-act="restart"><span>ЕЩЁ РАЗ</span><span>↺</span></button>
+  <button class="b" data-act="menu"><span>В МЕНЮ</span><span>☰</span></button>
+</div></div>
+
+<button class="hudbtn" id="muteBtn" aria-label="звук">♪</button>
+<button class="hudbtn" id="pauseBtn" aria-label="пауза">II</button>
+
+<div id="touch">
+  <div class="t" data-key="left" style="left:max(14px,env(safe-area-inset-left))">◀</div>
+  <div class="t" data-key="right" style="left:calc(max(14px,env(safe-area-inset-left)) + 86px)">▶</div>
+  <div class="t" data-key="down" style="left:calc(max(14px,env(safe-area-inset-left)) + 43px);bottom:calc(max(14px,env(safe-area-inset-bottom)) + 86px);width:62px;height:52px">▼</div>
+  <div class="t" data-key="dj" style="right:calc(max(14px,env(safe-area-inset-right)) + 172px)">DJ</div>
+  <div class="t" data-key="fire" style="right:calc(max(14px,env(safe-area-inset-right)) + 86px)">✦</div>
+  <div class="t" data-key="jump" style="right:max(14px,env(safe-area-inset-right))">▲</div>
+</div>
+<div id="rot">Поверни телефон горизонтально 📱↻</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

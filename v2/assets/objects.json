@@ -1,0 +1,365 @@
+{
+ "item_boom": {
+  "file": "item_boom.png",
+  "w": 16,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_boom_shine": {
+  "file": "item_boom_shine.png",
+  "w": 16,
+  "h": 24,
+  "frames": 4,
+  "fps": 10,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_rush": {
+  "file": "item_rush.png",
+  "w": 16,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_rush_shine": {
+  "file": "item_rush_shine.png",
+  "w": 16,
+  "h": 24,
+  "frames": 4,
+  "fps": 10,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_vip": {
+  "file": "item_vip.png",
+  "w": 16,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_vip_shine": {
+  "file": "item_vip_shine.png",
+  "w": 16,
+  "h": 24,
+  "frames": 4,
+  "fps": 10,
+  "anchor": [
+   8,
+   23
+  ]
+ },
+ "item_terea": {
+  "file": "item_terea.png",
+  "w": 21,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   10,
+   23
+  ]
+ },
+ "item_terea_shine": {
+  "file": "item_terea_shine.png",
+  "w": 21,
+  "h": 24,
+  "frames": 4,
+  "fps": 10,
+  "anchor": [
+   10,
+   23
+  ]
+ },
+ "item_shampoo": {
+  "file": "item_shampoo.png",
+  "w": 16,
+  "h": 26,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   8,
+   25
+  ]
+ },
+ "item_shampoo_shine": {
+  "file": "item_shampoo_shine.png",
+  "w": 16,
+  "h": 26,
+  "frames": 4,
+  "fps": 10,
+  "anchor": [
+   8,
+   25
+  ]
+ },
+ "poop": {
+  "file": "poop.png",
+  "w": 6,
+  "h": 7,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   3,
+   3
+  ]
+ },
+ "poop_splat": {
+  "file": "poop_splat.png",
+  "w": 12,
+  "h": 6,
+  "frames": 3,
+  "fps": 10,
+  "anchor": [
+   6,
+   5
+  ]
+ },
+ "slipper_spin": {
+  "file": "slipper_spin.png",
+  "w": 12,
+  "h": 12,
+  "frames": 4,
+  "fps": 16,
+  "anchor": [
+   6,
+   6
+  ]
+ },
+ "disc_spin": {
+  "file": "disc_spin.png",
+  "w": 12,
+  "h": 12,
+  "frames": 4,
+  "fps": 16,
+  "anchor": [
+   6,
+   6
+  ]
+ },
+ "note": {
+  "file": "note.png",
+  "w": 10,
+  "h": 12,
+  "frames": 2,
+  "fps": 6,
+  "anchor": [
+   5,
+   6
+  ]
+ },
+ "car_teana": {
+  "file": "car_teana.png",
+  "w": 120,
+  "h": 40,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   60,
+   39
+  ]
+ },
+ "car_teana_lights": {
+  "file": "car_teana_lights.png",
+  "w": 120,
+  "h": 40,
+  "frames": 2,
+  "fps": 3,
+  "anchor": [
+   60,
+   39
+  ]
+ },
+ "car_focus": {
+  "file": "car_focus.png",
+  "w": 108,
+  "h": 40,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   54,
+   39
+  ]
+ },
+ "car_focus_lights": {
+  "file": "car_focus_lights.png",
+  "w": 108,
+  "h": 40,
+  "frames": 2,
+  "fps": 3,
+  "anchor": [
+   54,
+   39
+  ]
+ },
+ "flag_wave": {
+  "file": "flag_wave.png",
+  "w": 28,
+  "h": 56,
+  "frames": 4,
+  "fps": 8,
+  "anchor": [
+   3,
+   55
+  ]
+ },
+ "finish_arch": {
+  "file": "finish_arch.png",
+  "w": 96,
+  "h": 80,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   48,
+   79
+  ]
+ },
+ "fx_dust": {
+  "file": "fx_dust.png",
+  "w": 16,
+  "h": 10,
+  "frames": 5,
+  "fps": 14,
+  "anchor": [
+   8,
+   9
+  ]
+ },
+ "fx_boom": {
+  "file": "fx_boom.png",
+  "w": 32,
+  "h": 32,
+  "frames": 6,
+  "fps": 14,
+  "anchor": [
+   16,
+   16
+  ]
+ },
+ "fx_smoke": {
+  "file": "fx_smoke.png",
+  "w": 8,
+  "h": 8,
+  "frames": 4,
+  "fps": 8,
+  "anchor": [
+   4,
+   4
+  ]
+ },
+ "fx_sparkle": {
+  "file": "fx_sparkle.png",
+  "w": 7,
+  "h": 7,
+  "frames": 4,
+  "fps": 12,
+  "anchor": [
+   3,
+   3
+  ]
+ },
+ "fx_hit": {
+  "file": "fx_hit.png",
+  "w": 12,
+  "h": 12,
+  "frames": 3,
+  "fps": 18,
+  "anchor": [
+   6,
+   6
+  ]
+ },
+ "prop_lamp": {
+  "file": "prop_lamp.png",
+  "w": 12,
+  "h": 50,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   6,
+   49
+  ]
+ },
+ "prop_bench": {
+  "file": "prop_bench.png",
+  "w": 34,
+  "h": 16,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   17,
+   15
+  ]
+ },
+ "prop_bin": {
+  "file": "prop_bin.png",
+  "w": 14,
+  "h": 18,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   7,
+   17
+  ]
+ },
+ "prop_kiosk": {
+  "file": "prop_kiosk.png",
+  "w": 42,
+  "h": 42,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   21,
+   41
+  ]
+ },
+ "prop_tree": {
+  "file": "prop_tree.png",
+  "w": 42,
+  "h": 58,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   21,
+   57
+  ]
+ },
+ "prop_hydrant": {
+  "file": "prop_hydrant.png",
+  "w": 12,
+  "h": 16,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   6,
+   15
+  ]
+ },
+ "prop_fountain": {
+  "file": "prop_fountain.png",
+  "w": 16,
+  "h": 24,
+  "frames": 2,
+  "fps": 5,
+  "anchor": [
+   7,
+   23
+  ]
+ }
+}

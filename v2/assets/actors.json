@@ -1,0 +1,117 @@
+{
+ "dog_run": {
+  "file": "dog_run.png",
+  "w": 34,
+  "h": 24,
+  "frames": 6,
+  "fps": 14,
+  "anchor": [
+   17,
+   23
+  ]
+ },
+ "dog_idle": {
+  "file": "dog_idle.png",
+  "w": 34,
+  "h": 24,
+  "frames": 2,
+  "fps": 3,
+  "anchor": [
+   17,
+   23
+  ]
+ },
+ "dog_dead": {
+  "file": "dog_dead.png",
+  "w": 34,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   17,
+   23
+  ]
+ },
+ "pigeon_fly": {
+  "file": "pigeon_fly.png",
+  "w": 20,
+  "h": 15,
+  "frames": 4,
+  "fps": 12,
+  "anchor": [
+   10,
+   7
+  ]
+ },
+ "pigeon_dead": {
+  "file": "pigeon_dead.png",
+  "w": 20,
+  "h": 15,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   10,
+   14
+  ]
+ },
+ "granny_walk": {
+  "file": "granny_walk.png",
+  "w": 30,
+  "h": 42,
+  "frames": 4,
+  "fps": 7,
+  "anchor": [
+   12,
+   41
+  ]
+ },
+ "granny_throw": {
+  "file": "granny_throw.png",
+  "w": 32,
+  "h": 46,
+  "frames": 3,
+  "fps": 8,
+  "anchor": [
+   12,
+   45
+  ],
+  "release_frame": 1,
+  "hand": [
+   26,
+   19
+  ]
+ },
+ "granny_dead": {
+  "file": "granny_dead.png",
+  "w": 38,
+  "h": 38,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   14,
+   37
+  ]
+ },
+ "courier_ride": {
+  "file": "courier_ride.png",
+  "w": 40,
+  "h": 44,
+  "frames": 4,
+  "fps": 12,
+  "anchor": [
+   20,
+   43
+  ]
+ },
+ "courier_dead": {
+  "file": "courier_dead.png",
+  "w": 54,
+  "h": 24,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   27,
+   23
+  ]
+ }
+}
