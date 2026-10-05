@@ -28,7 +28,12 @@ function pupFrame(k, o) {
   const hc = [(J.hipB[0] + J.hipF[0]) / 2, J.hipB[1]], lean = o.lean || 0, bob = o.bob || 0, tilt = o.tilt || 0;
   // breathing: the torso stretches up from the hips by br pixels and the head rides on top
   const br = o.breath || 0, hdy = bob + (o.headY || 0) - br;
-  g.save(); g.translate(Math.round(OX + hc[0]), Math.round(OY + hc[1] + bob)); g.rotate(lean); g.scale(1, 1 + br / (hc[1] - D.torso.y)); g.translate(-hc[0], -hc[1]); g.drawImage(o.arm ? armTorso(k) : D.torso.img, D.torso.x, D.torso.y); g.restore();
+  // torso-part point -> frame point (follows lean, bob and breathing)
+  const sy = 1 + br / (hc[1] - D.torso.y);
+  const tp = p => { const q = [p[0] - hc[0], (p[1] - hc[1]) * sy], c = Math.cos(lean), s = Math.sin(lean); return [OX + hc[0] + q[0] * c - q[1] * s, OY + hc[1] + bob + q[0] * s + q[1] * c]; };
+  // the far arm swings behind the body when walking or running
+  if (o.armB) { const A = ARM[k], S = tp([D.torso.x + A.shB[0], D.torso.y + A.shB[1]]); ikArm(g, S, [S[0] + o.armB.rel[0], S[1] + o.armB.rel[1]], A, A.back); }
+  g.save(); g.translate(Math.round(OX + hc[0]), Math.round(OY + hc[1] + bob)); g.rotate(lean); g.scale(1, sy); g.translate(-hc[0], -hc[1]); g.drawImage(o.arm ? armTorso(k, !!o.armB) : D.torso.img, D.torso.x, D.torso.y); g.restore();
   const nk = rot(J.neck, hc, lean), ha = lean + tilt;
   put(D.head, nk, J.neck, ha, hdy, null, HEAD_S);
   const sN = p => [J.neck[0] + (p[0] - J.neck[0]) * HEAD_S, J.neck[1] + (p[1] - J.neck[1]) * HEAD_S], m = rot(sN(PUP_MOUTH[k]), J.neck, ha), mx = OX + nk[0] + (m[0] - J.neck[0]), my = OY + nk[1] + (m[1] - J.neck[1]) + hdy;
@@ -38,21 +43,9 @@ function pupFrame(k, o) {
   // raised front arm (lighting up, drinking): two-bone IK from the shoulder to a point near the mouth or chest
   let hand = null;
   if (o.arm) {
-    const A = ARM[k], sy = 1 + br / (hc[1] - D.torso.y);
-    const tp = p => { const q = [p[0] - hc[0], (p[1] - hc[1]) * sy], c = Math.cos(lean), s = Math.sin(lean); return [OX + hc[0] + q[0] * c - q[1] * s, OY + hc[1] + bob + q[0] * s + q[1] * c]; };
-    const S = tp([D.torso.x + A.sh[0], D.torso.y + A.sh[1]]);
+    const A = ARM[k], S = tp([D.torso.x + A.sh[0], D.torso.y + A.sh[1]]);
     const T = o.arm.rel ? [S[0] + o.arm.rel[0], S[1] + o.arm.rel[1]] : o.arm.at === 'mouth' ? [mx + 4, my + 3] : o.arm.at === 'can' ? [mx + 7, my + 1] : [mx - 2, my + 26];
-    const dx = T[0] - S[0], dy = T[1] - S[1], d = Math.min(Math.hypot(dx, dy), A.L1 + A.L2 - 0.5), a = Math.atan2(dy, dx);
-    const b = Math.acos(Math.max(-1, Math.min(1, (A.L1 * A.L1 + d * d - A.L2 * A.L2) / (2 * A.L1 * d))));
-    const e1 = [S[0] + A.L1 * Math.cos(a + b), S[1] + A.L1 * Math.sin(a + b)], e2 = [S[0] + A.L1 * Math.cos(a - b), S[1] + A.L1 * Math.sin(a - b)];
-    const E = e1[1] > e2[1] ? e1 : e2, ea2 = Math.atan2(T[1] - E[1], T[0] - E[0]), H = [E[0] + A.L2 * Math.cos(ea2), E[1] + A.L2 * Math.sin(ea2)];
-    const line = (w, col) => { g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(S[0], S[1]); g.lineTo(E[0], E[1]); g.lineTo(H[0] - Math.cos(ea2) * 3, H[1] - Math.sin(ea2) * 3); g.stroke(); };
-    line(A.w + 3, A.dark); if (A.rim) { g.save(); g.translate(1.5, -1); line(A.w + 1, A.rim); g.restore(); } line(A.rim ? A.w - 1 : A.w, A.shade); g.save(); g.translate(-1, -1.5); line(A.w * 0.6, A.col); g.restore();
-    if (A.watch) { g.fillStyle = '#141018'; g.save(); g.translate(H[0] - Math.cos(ea2) * 4, H[1] - Math.sin(ea2) * 4); g.rotate(ea2); g.fillRect(-1.5, -3.5, 3, 7); g.restore(); }
-    g.fillStyle = '#4a2418'; g.beginPath(); g.arc(H[0], H[1], 5.5, 0, TAU); g.fill();
-    g.fillStyle = '#e2a47e'; g.beginPath(); g.arc(H[0], H[1], 4.2, 0, TAU); g.fill();
-    g.fillStyle = '#f4c4a0'; g.beginPath(); g.arc(H[0] - 1, H[1] - 1.5, 1.8, 0, TAU); g.fill();
-    hand = H;
+    hand = ikArm(g, S, T, A, A);
   }
   // feet on the ground: the frame ends at its lowest opaque row (airborne frames keep the standing baseline)
   let bottom = Math.round(OY + D.ground) + 1;
@@ -66,17 +59,35 @@ function pupFrame(k, o) {
 }
 // the raised front arm: shoulder in torso-part pixels, bone lengths, sleeve width and colours
 const ARM = {
-  azat: { sh: [53, 15], L1: 21, L2: 19, w: 12, col: '#f1e6da', shade: '#cdbcab', dark: '#5e4c44', watch: true },
-  arsen: { sh: [66, 12], L1: 22, L2: 20, w: 12, col: '#6a6274', shade: '#3a3442', dark: '#0c0a0e', pocket: [58, 44, 14, 18], fill: '#221e27' }
+  azat: { sh: [53, 15], L1: 21, L2: 19, w: 12, col: '#f1e6da', shade: '#cdbcab', dark: '#4a3a34', edge: 5, watch: true,
+    shB: [14, 18], pocketB: [11, 44, 12, 14], fillB: '#c9b8a6', back: { col: '#d6c8b8', shade: '#b09e8c', dark: '#4e3e38', skin: '#c88a66', skinHi: '#dca07c' } },
+  arsen: { sh: [66, 12], L1: 22, L2: 20, w: 12, col: '#6a6274', shade: '#3a3442', dark: '#0c0a0e', pocket: [58, 44, 14, 18], fill: '#221e27',
+    shB: [13, 14], pocketB: [3, 44, 12, 16], fillB: '#1c1820', back: { col: '#4a4454', shade: '#2a2530', dark: '#0c0a0e', skin: '#c88a66', skinHi: '#dca07c' } }
 };
-// torso with the front hand taken out of the pocket (that arm is drawn raised instead)
-function armTorso(k) {
-  const D = PUP[k], A = ARM[k];
-  if (D.torsoArm) return D.torsoArm;
+// two-bone IK arm from shoulder S towards T, elbow bending down; C holds the sleeve colours. Returns the hand point.
+function ikArm(g, S, T, A, C) {
+  const dx = T[0] - S[0], dy = T[1] - S[1], d = Math.max(1, Math.min(Math.hypot(dx, dy), A.L1 + A.L2 - 0.5)), a = Math.atan2(dy, dx);
+  const b = Math.acos(Math.max(-1, Math.min(1, (A.L1 * A.L1 + d * d - A.L2 * A.L2) / (2 * A.L1 * d))));
+  const e1 = [S[0] + A.L1 * Math.cos(a + b), S[1] + A.L1 * Math.sin(a + b)], e2 = [S[0] + A.L1 * Math.cos(a - b), S[1] + A.L1 * Math.sin(a - b)];
+  const E = e1[1] > e2[1] ? e1 : e2, ea2 = Math.atan2(T[1] - E[1], T[0] - E[0]), H = [E[0] + A.L2 * Math.cos(ea2), E[1] + A.L2 * Math.sin(ea2)];
+  const line = (w, col) => { g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(S[0], S[1]); g.lineTo(E[0], E[1]); g.lineTo(H[0] - Math.cos(ea2) * 3, H[1] - Math.sin(ea2) * 3); g.stroke(); };
+  line(A.w + (C.edge || 3), C.dark); line(A.w, C.shade); g.save(); g.translate(-1, -1.5); line(A.w * 0.6, C.col); g.restore();
+  if (A.watch && C === A) { g.fillStyle = '#141018'; g.save(); g.translate(H[0] - Math.cos(ea2) * 4, H[1] - Math.sin(ea2) * 4); g.rotate(ea2); g.fillRect(-1.5, -3.5, 3, 7); g.restore(); }
+  g.fillStyle = '#4a2418'; g.beginPath(); g.arc(H[0], H[1], 5.5, 0, TAU); g.fill();
+  g.fillStyle = C.skin || '#e2a47e'; g.beginPath(); g.arc(H[0], H[1], 4.2, 0, TAU); g.fill();
+  g.fillStyle = C.skinHi || '#f4c4a0'; g.beginPath(); g.arc(H[0] - 1, H[1] - 1.5, 1.8, 0, TAU); g.fill();
+  return H;
+}
+// torso with the front hand taken out of the pocket (that arm is drawn raised instead); both=true also hides the far hand
+function armTorso(k, both) {
+  const D = PUP[k], A = ARM[k], key = both ? 'torsoArms' : 'torsoArm';
+  if (D[key]) return D[key];
   const c = document.createElement('canvas'); c.width = D.torso.w; c.height = D.torso.h; const g = c.getContext('2d');
   g.drawImage(D.torso.img, 0, 0);
-  if (A.pocket) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = A.fill; g.fillRect(...A.pocket); }
-  return (D.torsoArm = c);
+  g.globalCompositeOperation = 'source-atop';
+  if (A.pocket) { g.fillStyle = A.fill; g.fillRect(...A.pocket); }
+  if (both) { g.fillStyle = A.fillB; g.fillRect(...A.pocketB); }
+  return (D[key] = c);
 }
 function buildPuppet(k) {
   const F = {}, mk1 = o => pupFrame(k, Object.assign({ deco: false }, o));
@@ -85,8 +96,8 @@ function buildPuppet(k) {
   F.WALK = []; F.RUN = [];
   for (let i = 0; i < 8; i++) {
     const p = i / 8 * TAU, sw = Math.sin(p), cs = Math.cos(p);
-    F.WALK.push(mk1({ tF: -0.34 * sw, tB: 0.34 * sw, sF: 0.55 * Math.max(0, cs), sB: 0.55 * Math.max(0, -cs), bob: Math.abs(cs) > 0.7 ? 0 : 1, lean: 0.03 }));
-    F.RUN.push(mk1({ arm: { rel: [6 + 16 * sw, 26 - 10 * Math.abs(sw) - 6 * sw] }, tF: -0.62 * sw, tB: 0.62 * sw, sF: 0.2 + 0.95 * Math.max(0, cs), sB: 0.2 + 0.95 * Math.max(0, -cs), bob: Math.abs(cs) > 0.7 ? 0 : 2, lean: 0.13, tilt: -0.05 }));
+    F.WALK.push(mk1({ arm: { rel: [4 - (sw > 0 ? 30 : 20) * sw, 33 - 7 * Math.abs(sw)] }, armB: { rel: [20 * sw, 33 - 6 * Math.abs(sw)] }, tF: -0.34 * sw, tB: 0.34 * sw, sF: 0.55 * Math.max(0, cs), sB: 0.55 * Math.max(0, -cs), bob: Math.abs(cs) > 0.7 ? 0 : 1, lean: 0.03 }));
+    F.RUN.push(mk1({ arm: { rel: [8 - (sw > 0 ? 32 : 22) * sw, 24 - 8 * Math.abs(sw) + 8 * sw] }, armB: { rel: [22 * sw, 24 - 8 * Math.abs(sw) - 8 * sw] }, tF: -0.62 * sw, tB: 0.62 * sw, sF: 0.2 + 0.95 * Math.max(0, cs), sB: 0.2 + 0.95 * Math.max(0, -cs), bob: Math.abs(cs) > 0.7 ? 0 : 2, lean: 0.13, tilt: -0.05 }));
   }
   // airborne: knees come up and the feet stay under the body (no backward kick)
   F.JUMP = [mk1({ arm: { rel: [16, -14] }, tF: -0.55, sF: 0.75, tB: -0.15, sB: 0.6, lean: 0.03, grounded: false }), mk1({ arm: { rel: [20, -6] }, tF: -0.75, sF: 1.0, tB: -0.4, sB: 0.95, lean: 0.02, grounded: false })];
