@@ -151,10 +151,18 @@ function drawPlayer(ctx) {
   ctx.globalAlpha = 1;
   if (!draw(ctx, name, i, fx, fy, p.dir)) { ctx.fillStyle = '#fff'; ctx.fillRect(p.x, p.y, p.w, p.h); }
   // the can in the raised hand
-  if (p.act && p.act.type === 'drink') {
+  if (p.act && p.act.type === 'drink' && a !== 'drink') {
+    // drinking on the run: the can tipped up at the mouth
+    const mouth = metaPoint(name, i, 0, fx, fy, p.dir), item = SPR[ITEM_SPR[p.act.item]];
+    if (mouth && item) {
+      const w = item.w >> 1, h = item.h >> 1;
+      ctx.save(); ctx.translate(Math.round(mouth[0] + p.dir), Math.round(mouth[1])); ctx.scale(p.dir, 1); ctx.rotate(-2.0);   // lid at the lips, bottom up and forward
+      ctx.drawImage(item.img, 0, 0, item.w, item.h, -(w >> 1), 0, w, h); ctx.restore();
+    }
+  } else if (p.act && p.act.type === 'drink') {
     const s = SPR[name], m = s && s.meta && s.meta[((i % s.frames) + s.frames) % s.frames];
     const hand = metaPoint(name, i, 6, fx, fy, p.dir), item = SPR[ITEM_SPR[p.act.item]];
-    if (hand && item) { ctx.save(); ctx.translate(Math.round(hand[0]), Math.round(hand[1])); ctx.scale(p.dir, 1); ctx.rotate(-(m ? m[8] : 0)); ctx.drawImage(item.img, 0, 0, item.w, item.h, -Math.round(item.w / 2), -Math.round(item.h * 0.65), item.w, item.h); ctx.restore(); }
+    if (hand && item) { ctx.save(); ctx.translate(Math.round(hand[0]), Math.round(hand[1])); ctx.scale(p.dir, 1); ctx.rotate(-(m ? m[8] : 0)); const w = item.w >> 1, h = item.h >> 1; ctx.drawImage(item.img, 0, 0, item.w, item.h, -(w >> 1), -Math.round(h * 0.65), w, h); ctx.restore(); }
   }
   // DJ headphones on the ear
   if (p.djMode > 0) {
@@ -232,7 +240,7 @@ function drawHUD(ctx) {
   for (const k of ['shampoo', 'terea', 'vip', 'rush', 'boom']) {
     const s = SPR[ITEM_SPR[k]], n = String(score.items[k]);
     const im = textImg(n, '#fff'); x -= im.width; ctx.drawImage(im, x, 9); x -= 2;
-    if (s) { const sc = 0.5; x -= Math.ceil(s.w * sc); ctx.drawImage(s.img, 0, 0, s.w, s.h, x, 5, Math.ceil(s.w * sc), Math.ceil(s.h * sc)); }
+    if (s) { const sc = 15 / s.h, w = Math.round(s.w * sc); x -= w; ctx.drawImage(s.img, 0, 0, s.w, s.h, x, 4, w, 15); }
     x -= 8;
   }
   if (G.intro > 0) {

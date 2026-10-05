@@ -115,7 +115,7 @@ function updatePlayer(dt) {
   // horizontal
   const want = (I.right ? 1 : 0) - (I.left ? 1 : 0);
   p.crouch = I.down && p.onGround && !p.act;
-  const max = p.act ? 45 : p.crouch ? 0 : p.boost > 0 ? BOOST_RUN : RUN;
+  const max = p.crouch ? 0 : p.boost > 0 ? BOOST_RUN : RUN;
   if (p.djIntro > 0) p.vx *= 0.8;
   else if (want) {
     const a = p.onGround ? (Math.sign(p.vx) === -want ? DEC + ACC : ACC) : AIR_ACC;
@@ -131,7 +131,6 @@ function updatePlayer(dt) {
   if (p.buffer > 0 && I.down && p.onGround && onLedge(p)) { p.dropThrough = 0.25; p.buffer = 0; }
   else if (p.buffer > 0 && p.coyote > 0 && p.djIntro <= 0) {
     p.vy = -JUMP_V * (p.boost > 0 ? 1.06 : 1); p.onGround = false; p.coyote = 0; p.buffer = 0; p.stretch = 1.25;
-    if (p.act && p.act.type !== 'talk') p.act = null;           // jumping cancels the pickup animation
     sfx('jump'); dust(p.x + p.w / 2, p.y + p.h, 4);
   }
   if (!I.jump && p.vy < -JUMP_CUT) p.vy = -JUMP_CUT;
@@ -193,7 +192,8 @@ export function playerAnim() {
   if (!p.onGround) return p.vy < -120 ? ['jump', 0] : p.vy < 60 ? ['jump', 1] : p.vy < 240 ? ['fall', 0] : ['fall', 1];
   if (p.djIntro > 0) return ['drop', Math.floor(G.t * 6)];
   if (p.shoot > 0) { const n = SPR[heroAnim('shoot')] ? SPR[heroAnim('shoot')].frames : 3; return ['shoot', Math.min(n - 1, Math.floor((1 - p.shoot / 0.24) * n))]; }
-  if (A) { const s = SPR[heroAnim(A.type)], n = s ? s.frames : 2; return [A.type, A.type === 'talk' ? Math.floor(A.t * 11) : Math.min(n - 1, Math.floor(A.t / A.dur * n))]; }
+  // pickups never slow him down: on the move he keeps running and the can goes to his mouth (see render)
+  if (A && Math.abs(p.vx) < 40) { const s = SPR[heroAnim(A.type)], n = s ? s.frames : 2; return [A.type, A.type === 'talk' ? Math.floor(A.t * 11) : Math.min(n - 1, Math.floor(A.t / A.dur * n))]; }
   if (p.crouch) return ['crouch', 0];
   if (p.land > 0) return ['land', 0];
   if (Math.abs(p.vx) > 100) return ['run', Math.floor(p.dist / 11)];

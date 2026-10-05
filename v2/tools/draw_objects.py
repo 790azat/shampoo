@@ -998,12 +998,12 @@ def build_props(book):
 
 # ================================================================== BUILD
 def build_items(book):
-    for name, fn in (('boom', item_boom), ('rush', item_rush), ('vip', item_vip),
-                     ('terea', item_terea), ('shampoo', item_shampoo)):
+    import draw_items as DI   # product-accurate collectibles
+    for name, fn in DI.ITEMS:
         base = fn()
         anc = [base.w // 2, base.h - 1]
-        book.add('item_' + name, [base], ITEM_PAL, fps=1, anchor=anc)
-        book.add('item_%s_shine' % name, shine_frames(base), ITEM_PAL, fps=10, anchor=anc)
+        book.add('item_' + name, [base], DI.PAL, fps=1, anchor=anc)
+        book.add('item_%s_shine' % name, shine_frames(base), DI.PAL, fps=10, anchor=anc)
 
 
 def build_proj(book):
