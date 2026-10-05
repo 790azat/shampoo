@@ -349,6 +349,8 @@ CAR_PAL = {
     'M': '#c4ccd8', 'm': '#7c8698', 'n': '#565f72',
     'Y': '#b9d0e4', 'y': '#8aa2ba', 'L': '#fff3a8', 'l': '#ffe066',
     'E': '#e2343e', 'e': '#9a1e2a', 'O': '#ff9a2a', 'B': '#1c1824',
+    # black paint (Vigen's G-Class)
+    'G': '#2c2c36', 'g': '#1d1d25', 'h': '#55556a', 'u': '#111116',
 }
 
 
@@ -518,8 +520,62 @@ def car_focus(lights=False):
     return s
 
 
+def car_gelik(lights=False):
+    """Vigen's black Mercedes G-Class: a tall box with a near-vertical windscreen, round headlights,
+    fender-top indicators, side step and the spare wheel on the back door."""
+    s = Spr(120, 46)
+    wr, wf, wy = 32, 96, 36
+    body = [(9, 41), (9, 6), (11, 4), (82, 4), (86, 17), (110, 18), (113, 20), (113, 40), (111, 41)]
+    s.polyfill(body, 'G')
+    arch(s, wr, wy, 11)
+    arch(s, wf, wy, 11)
+    for x in range(8, 115):                      # darker lower body
+        for y in range(29, 42):
+            if s.get(x, y) == 'G':
+                s.px(x, y, 'g')
+    s.hline(10, 112, 26, 'h')                    # the famous body crease
+    s.hline(12, 80, 5, 'h')                      # roof edge highlight
+    s.hline(86, 109, 18, 'h')                    # flat bonnet edge
+    # glass: three flat side windows + the upright windscreen edge
+    s.rect(13, 8, 33, 16, 'T')
+    s.rect(37, 8, 59, 16, 'T')
+    s.polyfill([(63, 8), (80, 8), (83.5, 16), (63, 16)], 'T')
+    for (x0, y0, x1, y1) in ((16, 15, 21, 9), (41, 15, 46, 9), (67, 15, 72, 9), (24, 15, 26, 12)):
+        s.line(x0, y0, x1, y1, 'r')
+    s.rect(34, 6, 36, 17, 'u'); s.rect(60, 6, 62, 17, 'u')       # pillars
+    # door seams, handles, hinges
+    s.vline(36, 17, 34, 'u'); s.vline(62, 17, 34, 'u'); s.vline(85, 18, 34, 'u')
+    s.hline(52, 56, 21, 'M'); s.hline(77, 81, 21, 'M')
+    s.px(37, 19, 'm'); s.px(37, 30, 'm'); s.px(63, 19, 'm'); s.px(63, 30, 'm')
+    # mirror
+    s.polyfill([(83, 12), (88, 11), (89, 15), (84, 16)], 'G'); s.hline(84, 88, 11, 'h')
+    # front: indicator on the fender top, round headlight, slatted grille, black bumper
+    s.rect(104, 16, 108, 17, 'O')
+    s.ellipse(110, 23, 3, 3, 'L' if lights else 'Y'); s.px(109, 22, 'H')
+    for y in (20, 22, 24, 26, 28):
+        s.hline(111, 113, y, 'h')
+    s.rect(104, 33, 114, 38, 'u'); s.hline(104, 114, 33, 'J')
+    # side step and black arch flares
+    s.rect(44, 39, 84, 40, 'u'); s.hline(44, 84, 39, 'J')
+    # rear: vertical tail light, black bumper, spare wheel on the door
+    s.rect(9, 20, 11, 30, 'E'); s.vline(11, 20, 30, 'e')
+    s.rect(6, 33, 14, 38, 'u')
+    s.ellipse(8, 23, 8, 8, 'K'); s.ring(8, 23, 8, 'J', 1)
+    s.ellipse(8, 23, 5, 5, 'g'); s.ring(8, 23, 5, 'h', 1)
+    s.px(8, 23, 'M'); s.px(8, 21, 'M'); s.px(6, 24, 'M'); s.px(10, 24, 'M')     # the three-pointed star
+    s.outline('k')
+    well(s, wr, wy, 11.6)
+    well(s, wf, wy, 11.6)
+    car_wheel(s, wr, wy, 9)
+    car_wheel(s, wf, wy, 9)
+    if lights:
+        for (x, y) in ((115, 21), (115, 23), (115, 25)):
+            s.px(x, y, 'L')
+    return s
+
+
 def build_cars(book):
-    for name, fn in (('teana', car_teana), ('focus', car_focus)):
+    for name, fn in (('teana', car_teana), ('focus', car_focus), ('gelik', car_gelik)):
         off = fn(False)
         on = fn(True)
         anc = [off.w // 2, off.h - 1]

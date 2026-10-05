@@ -208,6 +208,28 @@
    39
   ]
  },
+ "car_gelik": {
+  "file": "car_gelik.png",
+  "w": 120,
+  "h": 46,
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   60,
+   45
+  ]
+ },
+ "car_gelik_lights": {
+  "file": "car_gelik_lights.png",
+  "w": 120,
+  "h": 46,
+  "frames": 2,
+  "fps": 3,
+  "anchor": [
+   60,
+   45
+  ]
+ },
  "flag_wave": {
   "file": "flag_wave.png",
   "w": 28,

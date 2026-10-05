@@ -117,7 +117,7 @@ function drawEntities(ctx) {
   const vx0 = cam.x - 80, vx1 = cam.x + VIEW.w + 80, vis = x => x > vx0 && x < vx1;
   for (const d of ents.decor) if (vis(d.x)) draw(ctx, DECOR[d.ch], d.ch === 'f' ? frameAt('prop_fountain', G.t) : 0, d.x, d.y);
   if (vis(G.car.x)) {
-    const car = { azat: 'car_teana', arsen: 'car_focus' }[G.hero];
+    const car = { azat: 'car_teana', arsen: 'car_focus', vigen: 'car_gelik' }[G.hero];
     const s = SPR[car]; if (s) draw(ctx, car, 0, G.car.x + s.anchor[0] - 6, G.car.y);
   }
   for (const f of ents.flags) if (vis(f.x)) {
