@@ -21,142 +21,157 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'assets')
 OL = '#1a1024'
-W, H = 48, 60              # one canvas for every frame
+W, H = 56, 66              # one canvas for every frame
 GROUND = H - 2             # feet rest on this row
-AX = 22                    # anchor x (hip centre when standing)
+AX = 26                    # anchor x (hip centre when standing)
 
-# ------------------------------------------------------------------ palettes
-SKIN = {'L': '#f6cfae', 'S': '#e3a47c', 's': '#bd7552', 'q': '#8a4a32'}
-COMMON = {'k': OL, 'e': '#1a1024', 'w': '#ffffff', 'm': '#5a1a1a', 'r': '#c03a3a', **SKIN}
+# ------------------------------------------------------------------ palettes (sampled from Azat's character sheets)
+SKIN = {'L': '#f4c8a4', 'S': '#e2a580', 's': '#bf7a58', 'q': '#8a4c34'}
+COMMON = {'k': OL, 'e': '#1a1024', 'w': '#ffffff', 'm': '#5a1a1a', 'r': '#c03a3a', 'X': '#141218', **SKIN}
 HERO = {
     'azat': {
         'pal': {**COMMON,
-                'H': '#6e3f22', 'h': '#9a6236', 'I': '#3e2216',           # hair
-                'B': '#3f2519', 'b': '#5e3a26',                           # beard
-                'C': '#efe5d6', 'c': '#d2c1ab', 'D': '#a8957f', 'U': '#fffaf2',  # hoodie
-                'P': '#2b2426', 'p': '#3f3538', 'O': '#17131a',           # cargo pants
-                'F': '#ffffff', 'f': '#d6d8e2', 'G': '#a9aab8',           # sneakers
-                'X': '#1a1a22'},                                          # watch
+                'H': '#3c2416', 'h': '#6a4228', 'I': '#1e120c',           # dark brown quiff
+                'B': '#2c1a12', 'b': '#4a2e20',                           # full dark beard
+                'C': '#ece4d8', 'c': '#cfc3b2', 'D': '#a3947f', 'U': '#fbf7f0',  # oversized cream hoodie
+                'P': '#2a2422', 'p': '#3d3431', 'O': '#17131a',           # black baggy cargo
+                'F': '#f6f6f8', 'f': '#cfd0da', 'G': '#9d9eac', 'Z': '#d9dae2'},  # chunky white sneakers
         'sleeve': ('U', 'C', 'c'), 'sleeve_far': ('c', 'c', 'D'),
         'pants': ('p', 'P', 'O'), 'pants_far': ('P', 'O', 'O'),
         'watch': True,
     },
     'arsen': {
         'pal': {**COMMON,
-                'H': '#2a2730', 'h': '#45414e', 'I': '#16141a',           # bucket hat
-                'B': '#2a1c16', 'b': '#463026', 'Y': '#3a2418',           # beard, hair
-                'C': '#34303c', 'c': '#24212a', 'D': '#16141b', 'U': '#4c4757',  # overshirt
-                'T': '#141216', 't': '#ff9a2e', 'y': '#ffd23a', 'o': '#d8502a',  # tee + print
-                'P': '#262329', 'p': '#38343e', 'O': '#141217',           # cargo pants
-                'F': '#2e2c36', 'f': '#46434f', 'G': '#d9d0bd'},          # dark sneakers, light sole
+                'H': '#24222a', 'h': '#3a3742', 'I': '#0f0d12', 'y': '#e0b44a',  # black bucket hat, gold logo
+                'B': '#24170f', 'b': '#3e2a1e', 'Y': '#2e1e14',           # beard, side hair
+                'C': '#2a2730', 'c': '#1c1a21', 'D': '#121015', 'U': '#3e3a46',  # black overshirt
+                'T': '#141216', 't': '#ff8a2a', 'o': '#d8482a', 'g': '#ffd05a',  # black tee, sunset print
+                'P': '#28252b', 'p': '#3a363e', 'O': '#141217',           # black cargo
+                'F': '#2a2830', 'f': '#ececf0', 'G': '#f0ece2', 'Z': '#1c1a20'},  # black/white sneakers
         'sleeve': ('U', 'C', 'c'), 'sleeve_far': ('c', 'c', 'D'),
         'pants': ('p', 'P', 'O'), 'pants_far': ('P', 'O', 'O'),
-        'watch': False,
+        'watch': True,
     },
 }
 
-# ------------------------------------------------------------------ hand-drawn parts (facing right)
-# heads: anchor = neck point (column, row) given after each map; mouth/ear/top in head coords
+# ------------------------------------------------------------------ hand-drawn parts, 3/4 view facing right
 HEADS = {
     'azat': dict(art="""
-.......hhhh.....
-.....hhHHHHh....
-...hhHHHHHHHh...
+.......hhhhh....
+.....hhHHHHHh...
+...hhHHHHHHHHh..
 ..hHHHHHHHHHHH..
-.HHHHHHHHHHHHH..
-HHHHHIHHHHHHHI..
-HHHHIISSSSIIS...
-.HIISLLSSSSSS...
-.HISsLSSSeSSS...
-.IIssSSSSSSSSS..
-..IsSSSSSSSSSs..
-..IBBsSSSBBBBB..
-..BBBBBBBmmmBB..
+.IHHHHHHHHHHHH..
+.IIHHHHHHHHHH...
+.IIIISSSSSSSS...
+.IIsSSIIISSIIS..
+.IsLsSSeSSSeSS..
+.IssSSSSSSSsSSS.
+.IBsSSSSSSSsSS..
+.IBBsBBBBBBBBB..
+..BBBBBBmmmBBB..
 ..BBBBBBBBBBBB..
 ...BBBBBBBBBB...
-....BBBbbBB.....
-""", neck=(6, 15), mouth=(10, 12), ear=(4, 9), top=(8, 0)),
+....BBBBBBB.....
+""", neck=(7, 15), mouth=(10, 12), ear=(3, 8), top=(7, 0)),
     'arsen': dict(art="""
-....hhhhhh......
-...hHHHHHHh.....
-..hHHHHHHHHh....
-..HHHHHHHHHH....
-.hHHHHHHHHHHh...
-IIIIIIIIIIIIIII.
-II.YSSSSSIISS.II
-.YYSLLSSSSSSS...
-.YYSsLSSSeSSS...
-.YYssSSSSSSSSS..
-..YsSSSSSSSSSs..
-..BBsSSSBBBBBB..
-..BBBBBBBmmBBB..
+....hhhhhhh.....
+...hHHHHHHHh....
+..hHHHHHHHHHh...
+..HHHHHHHHyHH...
+.hHHHHHHHHHHHh..
+IIIIIIIIIIIIIIII
+IIYYSSSSSSSSSII.
+.YYsSSSIISSIIS..
+.YsLwSSeSSSeSS..
+.YsSsSSSSSSSsSS.
+.YBsSSSSSSSsSS..
+.BBBsBBBBBBBBB..
+..BBBBBBmmBBBB..
 ..BBBBBBBBBBBB..
 ...BBBBBBBBBB...
-....BBBBBBBB....
-""", neck=(6, 15), mouth=(10, 12), ear=(4, 9), top=(7, 0)),
+....BBBBBBB.....
+""", neck=(7, 15), mouth=(10, 12), ear=(3, 8), top=(7, 0)),
 }
 # torsos: hip anchor (x, y) and near/far shoulder points in torso coords
 TORSOS = {
     'azat': dict(art="""
-..cccc.........
-.cUUUUCCUU.....
-cUCCCCCCCCU....
-cCCCCCCCCCCU...
-cCCCCCCCCCCCC..
-cCCCCCCCCCCDC..
-cCCCCCCCCCCDC..
-cCCCCCCCCCCCC..
-cCCCCCCCCCCCC..
-cCCCCCCCCCCCC..
-ccCCCDDDDDDCC..
-ccCCCDCCCCCDC..
-ccCCCDCCCCCDC..
-.ccCCDDDDDDCC..
-.cccccccccccc..
-..cDcDcDcDcD...
-""", hip=(7, 15), sh=(8, 3), sh_far=(4, 3)),
+......cCCCCCc.......
+....cCUUUUUUCCc.....
+..cCUUUCDDDDCUCCc...
+.cCUUUUCDDDDCCCCCc..
+cCUUUUUUCCCCCCCCCCc.
+cCUUUUUCCCCDCDCCCCc.
+cCUUUUCCCCCDCDCCCCc.
+cCUUUUCCCCCDCDCCCCc.
+cCUUUCCCCCCDCDCCCcc.
+cCUUUCCCCCCXCXCCCcc.
+cCUUCCCCCCCCCCCCCcc.
+cCUUCCCCCCCCCCCCCcc.
+cCUCCCCCCCCCCCCCCcc.
+cCUCCCCCCCCCCCCCCcc.
+cCUCCCCDDDDDDDDCCcc.
+cCCCCCCDCCCCCCDCCcc.
+cCCCCCCDCCCCCCDCCcc.
+cCCCCCCDDCCCCDDCCcc.
+cCCCCCCCCCCCCCCCCcc.
+.cDDDDDDDDDDDDDDDDc.
+.cDcDcDcDcDcDcDcDcc.
+""", hip=(9, 20), sh=(5, 5), sh_far=(15, 5), neck=(9, 2)),
     'arsen': dict(art="""
-...UCCU..U.....
-..UCCCCCCUTT...
-.UCCCCCCCCTtU..
-UCCCCCCCCCtyTC.
-CCCCCCCCCCyotC.
-CCCCCCCCCCotyC.
-CCCCCCCCCCtyoC.
-CCCCCCCCCCTTTC.
-CCCCCDDCCCTtTC.
-CCCCCCCCCCTTTC.
-cCCCCCCCCCTTTC.
-cCCCCCCCCCTTTC.
-cCCCCCCCCCTTTC.
-ccCCCCCCCCTTTC.
-.ccccccccPPPPc.
-..PPPPPPPPPPP..
-""", hip=(7, 15), sh=(8, 3), sh_far=(4, 3)),
+.......UCTTTTCU.......
+.....cUUCTTTTTCUUc....
+...cCUUUCTTTTTCCUCCc..
+..cCUUUUCTttttTCCCCCc.
+.cCUUUUUCTggggTCCCCCCc
+.cCUUUUUCToooTTCCCCCCc
+cCUDDDDUCTgttgTCDDDDCc
+cCUDCCDUCTttttTCDCCDCc
+cCUCCCCCCTTggTTCCCCCCc
+cCUCCCCCCTTTTTTCCCCCCc
+cCUCCCCCCTTTTTTCCCCCCc
+cCUCCCCCCTTTTTTCCCCCCc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCCTTTTTTCCCCCcc
+cCCCCCCCcTTTTTTcCCCCcc
+.ccccccccTTTTTTccccccc
+.........PPPPPP.......
+""", hip=(11, 21), sh=(5, 5), sh_far=(17, 5), neck=(11, 2)),
 }
-# shoes, ankle at (1, 0): flat, toe-down (heel raised), heel-strike (toe raised)
+# chunky sneakers, ankle at the given point: flat, toe-down (heel raised), heel-strike (toe up), in the air
 SHOES = {
     'flat': ("""
-.FFF....
-FFFFFFf.
-GGGGGGGG
-""", (2, 0)),
+...FFFFF....
+..FFFFFFFF..
+.FFFFFFFFFF.
+FFFFfFFFfFFf
+GGGGGGGGGGGG
+""", (4, 0)),
     'toe': ("""
-.FF.....
-.FFFf...
-..FFFFf.
-...GGGGG
-""", (2, 0)),
+..FFFF......
+..FFFFFF....
+...FFFFFFF..
+....FFFfFFFf
+.....GGGGGGG
+""", (3, 0)),
     'heel': ("""
-.FFF..ff
-FFFFFFf.
-GGGGGG..
-""", (2, 0)),
+..FFFFF..ff.
+.FFFFFFFFff.
+FFFFFFFFFf..
+FFFFfFFFf...
+GGGGGGGG....
+""", (4, 0)),
     'air': ("""
-.FFF....
-.FFFFFf.
-..GGGGG.
-""", (2, 0)),
+..FFFF......
+..FFFFFFFF..
+...FFFFFFFFf
+....FfFFFFf.
+.....GGGGGG.
+""", (3, 0)),
 }
 
 
@@ -223,8 +238,8 @@ def rot(a):
 
 
 # ------------------------------------------------------------------ pose -> frame
-LEG = (10.5, 10.0)      # thigh, shin (hip -> knee -> ankle)
-ARM = (8.0, 7.0)      # upper arm, forearm (shoulder -> elbow -> wrist)
+LEG = (10.0, 10.0)      # thigh, shin (hip -> knee -> ankle)
+ARM = (8.5, 8.0)      # upper arm, forearm (shoulder -> elbow -> wrist)
 
 
 def leg_points(hip, thigh, knee):
@@ -272,7 +287,7 @@ def render(hero, P):
     if P.get('air') is None:
         hipY = GROUND - max(lows) + P.get('bob', 0)
     else:
-        hipY = GROUND - 22 - P['air']
+        hipY = GROUND - 24 - P['air']
     hip = (AX + P.get('dx', 0), hipY)
     cv = Canvas()
     T = TORSOS[hero]
@@ -295,19 +310,20 @@ def render(hero, P):
 
     def draw_leg(spec, cols, far):
         th, kn, shoe = spec
-        hp = (hip[0] + (-2.0 if far else 1.5), hip[1])
+        hp = (hip[0] + (3.2 if far else -3.2), hip[1])
         K, A = leg_points(hp, th, kn)
-        g = capsules([(hp[0], hp[1], K[0], K[1], 3.3), (K[0], K[1], A[0], A[1], 2.8)], cols)
+        g = capsules([(hp[0], hp[1], K[0], K[1], 4.7), (K[0], K[1], A[0], A[1], 4.1)], cols)
         # cargo pocket on the near thigh
         if not far:
-            mx, my = int((hp[0] + K[0]) / 2), int((hp[1] + K[1]) / 2)
-            for yy in range(my, my + 3):
-                for xx in range(mx - 1, mx + 1):
+            mx, my = int(round(hp[0] + (K[0] - hp[0]) * 0.55)) - 1, int(round(hp[1] + (K[1] - hp[1]) * 0.45))
+            for yy in range(my, my + 5):
+                for xx in range(mx - 2, mx + 2):
                     if 0 <= yy < H and 0 <= xx < W and g[yy, xx] != '.':
-                        g[yy, xx] = cols[2]
+                        edge = yy in (my, my + 4) or xx in (mx - 2, mx + 1)
+                        g[yy, xx] = cols[2] if edge else cols[0] if yy == my + 1 else cols[1]
         sa, (ax, ay) = art(SHOES[shoe][0]), SHOES[shoe][1]
         if far:
-            sa = np.where(sa == 'F', 'f', sa)
+            sa = np.where(sa == 'F', 'Z', sa)
         sx, sy = int(round(A[0])) - ax, int(round(A[1])) - ay
         for y in range(sa.shape[0]):
             for x in range(sa.shape[1]):
@@ -326,13 +342,13 @@ def render(hero, P):
             up, el = spec[:2]
             E, Wr = arm_points(S, up, el)
             s, c = rot(up + el)
-        g = capsules([(S[0], S[1], E[0], E[1], 2.6), (E[0], E[1], Wr[0], Wr[1], 2.2)], cols)
+        g = capsules([(S[0], S[1], E[0], E[1], 3.2), (E[0], E[1], Wr[0], Wr[1], 2.8)], cols)
         if not isinstance(spec, dict) and len(spec) > 2 and spec[2] == 'pocket':      # hand tucked in the trouser pocket
             cv.layer(outline(g), 0, 0)
             return (-1, -1)
         # hand
-        Hc = (Wr[0] + 1.6 * s, Wr[1] + 1.6 * c)
-        hg = capsules([(Wr[0], Wr[1], Hc[0], Hc[1], 1.6)], ('S', 'S', 's') if not far else ('s', 's', 'q'))
+        Hc = (Wr[0] + 2.0 * s, Wr[1] + 2.0 * c)
+        hg = capsules([(Wr[0], Wr[1], Hc[0], Hc[1], 2.1)], ('S', 'S', 's') if not far else ('s', 's', 'q'))
         g[hg != '.'] = hg[hg != '.']
         if D['watch'] and not far:
             wx, wy = int(round(Wr[0] - 0.8 * s)), int(round(Wr[1] - 0.8 * c))
@@ -359,8 +375,8 @@ def render(hero, P):
     if P.get('mouth'):
         mx_, my_ = hd['mouth']
         ha = ha.copy(); ha[my_, mx_ - 1] = 'm'; ha[my_ + 1, mx_ - 1] = 'm'; ha[my_ + 1, mx_] = 'm'
-    nx = tx0 + 2 + T['sh'][0] + int(round(lean * 1.2)) + P.get('hdx', 0)
-    ny = ty0 - br + P.get('hdy', 0)
+    nx = tx0 + 2 + T['neck'][0] + int(round(lean * 1.2)) + P.get('hdx', 0)
+    ny = ty0 + T['neck'][1] - br + P.get('hdy', 0)
     hx0, hy0 = nx - hd['neck'][0], ny - hd['neck'][1]
     cv.layer(outline(pad(ha)), hx0 - 1, hy0 - 1)
     mouth = (hx0 + hd['mouth'][0], hy0 + hd['mouth'][1])
@@ -422,14 +438,14 @@ def run():
     return out
 
 
-POCKET_N, POCKET_F = (-8, 24, 'pocket'), (6, 20, 'pocket')
+POCKET_N, POCKET_F = (-6, 34), (6, 20, 'pocket')   # near hand resting at the hip, as on the sheets
 
 
 def idle():
-    return [dict(legN=(6, 3, 'flat'), legF=(-7, 3, 'flat'), armN=POCKET_N, armF=POCKET_F, breath=b) for b in (0, 0, 1, 1)]
+    return [dict(legN=(4, 3, 'flat'), legF=(-4, 3, 'flat'), armN=POCKET_N, armF=None, breath=b) for b in (0, 0, 1, 1)]
 
 
-STAND = dict(legN=(6, 3, 'flat'), legF=(-7, 3, 'flat'), armF=POCKET_F)
+STAND = dict(legN=(4, 3, 'flat'), legF=(-4, 3, 'flat'), armF=None)
 CHEST = {'dx': -1, 'dy': 10}
 MOUTH = {'dx': 2, 'dy': 1}
 CAN = {'dx': 4, 'dy': 0}
@@ -446,7 +462,7 @@ def jump():
 
 def fall():
     return [dict(legN=(30, 44, 'air'), legF=(-4, 52, 'air'), armN=(100, 30), armF=(140, 20), air=2),
-            dict(legN=(14, 16, 'air'), legF=(-16, 30, 'air'), armN=(118, 20), armF=(165, 20), air=0, mouth=True)]
+            dict(legN=(14, 16, 'air'), legF=(-16, 30, 'air'), armN=(92, 34), armF=(165, 20), air=0, mouth=True)]
 
 
 def build(hero):
@@ -463,7 +479,7 @@ def build(hero):
                    dict(legN=(24, 14, 'flat'), legF=(-18, 12, 'toe'), armN=(68, 10), armF=(-30, 30), lean=2)], 14),
         'drop': ([dict(legN=(14, 8, 'flat'), legF=(-12, 8, 'flat'), armN=(120, 50), armF=(-18, 24), mouth=True, lean=-1),
                   dict(legN=(14, 8, 'flat'), legF=(-12, 8, 'flat'), armN=(128, 44), armF=(-24, 28), mouth=True, bob=1, lean=-1)], 6),
-        'hurt': ([dict(legN=(24, 34, 'flat'), legF=(-12, 22, 'toe'), armN=(112, 40), armF=(160, 20), lean=-3, mouth=True, hdx=-1)], 1),
+        'hurt': ([dict(legN=(24, 34, 'flat'), legF=(-12, 22, 'toe'), armN=(84, 50), armF=(160, 20), lean=-3, mouth=True, hdx=-1)], 1),
         'dead': ([dict(legN=(4, 4, 'flat'), legF=(-6, 6, 'flat'), armN=(100, 0), armF=(80, 10), mouth=True)], 1),
         'talk': ([st(armN=(40, 60)), st(armN=(46, 70), mouth=True)], 11),
         'smoke': ([st(armN=dict(CHEST), prop='cig'),

@@ -141,9 +141,9 @@ function drawPlayer(ctx) {
   if (p.inv > 0 && G.state === 'play' && Math.floor(p.inv * 14) % 2) return;
   const [a, i] = playerAnim(), name = `hero_${G.hero}_${a}`, [fx, fy] = heroFeet();
   if (G.state === 'dying' && !p.pit) {
-    // lies on his back, then a ghost floats up
+    // the sheet's own lying frame, then a ghost floats up
     const s = SPR[name];
-    if (s) { ctx.save(); ctx.translate(Math.round(fx), Math.round(fy)); ctx.scale(p.dir, 1); ctx.rotate(-Math.PI / 2 * Math.min(1, p.dead * 4)); ctx.drawImage(s.img, 0, 0, s.w, s.h, -s.anchor[0], -s.anchor[1], s.w, s.h); ctx.restore(); }
+    if (s) { ctx.save(); ctx.translate(Math.round(fx), Math.round(fy)); ctx.scale(p.dir, 1); ctx.drawImage(s.img, 0, 0, s.w, s.h, -s.anchor[0], -s.anchor[1], s.w, s.h); ctx.restore(); }
     if (p.dead > 0.5) { ctx.globalAlpha = Math.max(0, 1 - (p.dead - 0.5)); ctx.drawImage(ghost(), Math.round(fx - 7 + Math.sin(p.dead * 6) * 3), Math.round(fy - 50 - (p.dead - 0.5) * 50)); ctx.globalAlpha = 1; }
     return;
   }
